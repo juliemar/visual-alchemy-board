@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ReactFlow,
@@ -36,6 +36,8 @@ const CanvasInner = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [boardName, setBoardName] = useState("");
   const [zoom, setZoom] = useState(1);
+  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const isInitialLoadRef = useRef(true);
 
   useEffect(() => {
     loadBoard();
@@ -148,6 +150,8 @@ const CanvasInner = () => {
 
       toast.success("Board iniciado com nós de exemplo!");
     }
+    
+    isInitialLoadRef.current = false;
   };
 
   const saveNode = async (node: Node) => {
@@ -169,6 +173,49 @@ const CanvasInner = () => {
     }
   };
 
+  // Autosave com debounce
+  const debouncedSave = useCallback(() => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    
+    saveTimeoutRef.current = setTimeout(async () => {
+      if (!boardId || isInitialLoadRef.current) return;
+      
+      // Salvar todos os nós
+      for (const node of nodes) {
+        await supabase.from("nodes").upsert({
+          id: node.id,
+          board_id: boardId,
+          node_type: node.type || 'image_upload',
+          node_data: node.data as any,
+          position_x: node.position.x,
+          position_y: node.position.y,
+        }, {
+          onConflict: 'id'
+        });
+      }
+      
+      console.log('Autosaved:', nodes.length, 'nodes');
+    }, 1000); // Salva 1 segundo após última mudança
+  }, [boardId, nodes]);
+
+  // Trigger autosave quando nodes mudam
+  useEffect(() => {
+    if (!isInitialLoadRef.current) {
+      debouncedSave();
+    }
+  }, [nodes, debouncedSave]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const onConnect = useCallback(
     async (connection: Connection) => {
       if (!boardId) return;
@@ -176,11 +223,16 @@ const CanvasInner = () => {
       const newEdge = addEdge(connection, edges);
       setEdges(newEdge);
 
-      await supabase.from("connections").insert({
+      // Salvar conexão no banco
+      const { error } = await supabase.from("connections").insert({
         board_id: boardId,
         source_node_id: connection.source!,
         target_node_id: connection.target!,
       });
+
+      if (!error) {
+        toast.success("Conexão criada e salva!");
+      }
     },
     [boardId, edges]
   );
@@ -189,14 +241,17 @@ const CanvasInner = () => {
     if (!boardId) return;
 
     const newNode: Node = {
-      id: `${Date.now()}`,
+      id: `node-${Date.now()}`,
       type,
-      position: { x: Math.random() * 400, y: Math.random() * 400 },
+      position: { x: 200 + Math.random() * 300, y: 200 + Math.random() * 300 },
       data: {},
     };
 
     setNodes((nds) => [...nds, newNode]);
+    
+    // Salvar novo nó imediatamente
     await saveNode(newNode);
+    toast.success("Nó criado e salvo!");
   };
 
   const handleImageUpload = async (nodeId: string, file: File) => {
@@ -215,6 +270,7 @@ const CanvasInner = () => {
       const node = nodes.find((n) => n.id === nodeId);
       if (node) {
         await saveNode({ ...node, data: { ...node.data, imageUrl: base64 } });
+        toast.success("Imagem carregada e salva!");
       }
     };
     reader.readAsDataURL(file);
@@ -253,16 +309,22 @@ const CanvasInner = () => {
     };
 
     setNodes((nds) => [...nds, resultNode]);
-    setEdges((eds) => [
-      ...eds,
-      {
-        id: `${nodeId}-${resultNodeId}`,
-        source: nodeId,
-        target: resultNodeId,
-      },
-    ]);
+    
+    const newEdge = {
+      id: `edge-${nodeId}-${resultNodeId}`,
+      source: nodeId,
+      target: resultNodeId,
+    };
+    
+    setEdges((eds) => [...eds, newEdge]);
 
+    // Salvar nó e conexão
     await saveNode(resultNode);
+    await supabase.from("connections").insert({
+      board_id: boardId,
+      source_node_id: nodeId,
+      target_node_id: resultNodeId,
+    });
 
     try {
       const { data, error } = await supabase.functions.invoke("generate-image", {
