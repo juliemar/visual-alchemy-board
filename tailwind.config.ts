@@ -57,6 +57,13 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        canvas: {
+          bg: "hsl(var(--canvas-bg))",
+          node: "hsl(var(--node-bg))",
+          nodeBorder: "hsl(var(--node-border))",
+          nodeShadow: "hsl(var(--node-shadow))",
+          connection: "hsl(var(--connection-line))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
