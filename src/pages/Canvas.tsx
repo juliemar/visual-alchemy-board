@@ -91,19 +91,19 @@ const CanvasInner = () => {
       // Board vazio - criar nós iniciais
       const initialNodes: Node[] = [
         {
-          id: "initial-upload-1",
+          id: crypto.randomUUID(),
           type: "image_upload",
           position: { x: 100, y: 150 },
           data: {},
         },
         {
-          id: "initial-upload-2",
+          id: crypto.randomUUID(),
           type: "image_upload",
           position: { x: 100, y: 350 },
           data: {},
         },
         {
-          id: "initial-prompt",
+          id: crypto.randomUUID(),
           type: "prompt",
           position: { x: 400, y: 250 },
           data: {},
@@ -125,16 +125,16 @@ const CanvasInner = () => {
       // Criar conexões iniciais
       const initialConnections = [
         {
-          id: "conn-1",
+          id: crypto.randomUUID(),
           board_id: boardId,
-          source_node_id: "initial-upload-1",
-          target_node_id: "initial-prompt",
+          source_node_id: initialNodes[0].id,
+          target_node_id: initialNodes[2].id,
         },
         {
-          id: "conn-2",
+          id: crypto.randomUUID(),
           board_id: boardId,
-          source_node_id: "initial-upload-2",
-          target_node_id: "initial-prompt",
+          source_node_id: initialNodes[1].id,
+          target_node_id: initialNodes[2].id,
         },
       ];
 
@@ -144,8 +144,8 @@ const CanvasInner = () => {
 
       setNodes(initialNodes);
       setEdges([
-        { id: "conn-1", source: "initial-upload-1", target: "initial-prompt" },
-        { id: "conn-2", source: "initial-upload-2", target: "initial-prompt" },
+        { id: initialConnections[0].id, source: initialNodes[0].id, target: initialNodes[2].id },
+        { id: initialConnections[1].id, source: initialNodes[1].id, target: initialNodes[2].id },
       ]);
 
       toast.success("Board iniciado com nós de exemplo!");
@@ -216,15 +216,44 @@ const CanvasInner = () => {
     };
   }, []);
 
+  // Salvar antes de sair da página
+  useEffect(() => {
+    const handleBeforeUnload = async (e: BeforeUnloadEvent) => {
+      if (nodes.length > 0 && !isInitialLoadRef.current) {
+        // Força save síncrono antes de sair
+        for (const node of nodes) {
+          await supabase.from("nodes").upsert({
+            id: node.id,
+            board_id: boardId,
+            node_type: node.type || 'image_upload',
+            node_data: node.data as any,
+            position_x: node.position.x,
+            position_y: node.position.y,
+          }, {
+            onConflict: 'id'
+          });
+        }
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [nodes, boardId]);
+
   const onConnect = useCallback(
     async (connection: Connection) => {
       if (!boardId) return;
 
-      const newEdge = addEdge(connection, edges);
-      setEdges(newEdge);
+      const connId = crypto.randomUUID();
+      const newEdge = { id: connId, source: connection.source!, target: connection.target! };
+      setEdges((eds) => [...eds, newEdge]);
 
       // Salvar conexão no banco
       const { error } = await supabase.from("connections").insert({
+        id: connId,
         board_id: boardId,
         source_node_id: connection.source!,
         target_node_id: connection.target!,
@@ -234,14 +263,14 @@ const CanvasInner = () => {
         toast.success("Conexão criada e salva!");
       }
     },
-    [boardId, edges]
+    [boardId]
   );
 
   const handleCreateNode = async (type: "image_upload" | "prompt") => {
     if (!boardId) return;
 
     const newNode: Node = {
-      id: `node-${Date.now()}`,
+      id: crypto.randomUUID(),
       type,
       position: { x: 200 + Math.random() * 300, y: 200 + Math.random() * 300 },
       data: {},
@@ -297,7 +326,7 @@ const CanvasInner = () => {
       )
     );
 
-    const resultNodeId = `result-${Date.now()}`;
+    const resultNodeId = crypto.randomUUID();
     const resultNode: Node = {
       id: resultNodeId,
       type: "generated_image",
@@ -310,8 +339,9 @@ const CanvasInner = () => {
 
     setNodes((nds) => [...nds, resultNode]);
     
+    const edgeId = crypto.randomUUID();
     const newEdge = {
-      id: `edge-${nodeId}-${resultNodeId}`,
+      id: edgeId,
       source: nodeId,
       target: resultNodeId,
     };
@@ -321,6 +351,7 @@ const CanvasInner = () => {
     // Salvar nó e conexão
     await saveNode(resultNode);
     await supabase.from("connections").insert({
+      id: edgeId,
       board_id: boardId,
       source_node_id: nodeId,
       target_node_id: resultNodeId,
