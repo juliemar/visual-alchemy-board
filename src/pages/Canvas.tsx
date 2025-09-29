@@ -68,7 +68,7 @@ const CanvasInner = () => {
       .select("*")
       .eq("board_id", boardId);
 
-    if (nodesData) {
+    if (nodesData && nodesData.length > 0) {
       const loadedNodes: Node[] = nodesData.map((node) => ({
         id: node.id,
         type: node.node_type,
@@ -76,15 +76,77 @@ const CanvasInner = () => {
         data: (node.node_data as Record<string, unknown>) || {},
       }));
       setNodes(loadedNodes);
-    }
 
-    if (connectionsData) {
-      const loadedEdges: Edge[] = connectionsData.map((conn) => ({
-        id: conn.id,
-        source: conn.source_node_id,
-        target: conn.target_node_id,
-      }));
-      setEdges(loadedEdges);
+      if (connectionsData) {
+        const loadedEdges: Edge[] = connectionsData.map((conn) => ({
+          id: conn.id,
+          source: conn.source_node_id,
+          target: conn.target_node_id,
+        }));
+        setEdges(loadedEdges);
+      }
+    } else {
+      // Board vazio - criar nós iniciais
+      const initialNodes: Node[] = [
+        {
+          id: "initial-upload-1",
+          type: "image_upload",
+          position: { x: 100, y: 150 },
+          data: {},
+        },
+        {
+          id: "initial-upload-2",
+          type: "image_upload",
+          position: { x: 100, y: 350 },
+          data: {},
+        },
+        {
+          id: "initial-prompt",
+          type: "prompt",
+          position: { x: 400, y: 250 },
+          data: {},
+        },
+      ];
+
+      // Salvar nós iniciais no banco
+      for (const node of initialNodes) {
+        await supabase.from("nodes").insert({
+          id: node.id,
+          board_id: boardId,
+          node_type: node.type || 'image_upload',
+          node_data: node.data as any,
+          position_x: node.position.x,
+          position_y: node.position.y,
+        });
+      }
+
+      // Criar conexões iniciais
+      const initialConnections = [
+        {
+          id: "conn-1",
+          board_id: boardId,
+          source_node_id: "initial-upload-1",
+          target_node_id: "initial-prompt",
+        },
+        {
+          id: "conn-2",
+          board_id: boardId,
+          source_node_id: "initial-upload-2",
+          target_node_id: "initial-prompt",
+        },
+      ];
+
+      for (const conn of initialConnections) {
+        await supabase.from("connections").insert(conn);
+      }
+
+      setNodes(initialNodes);
+      setEdges([
+        { id: "conn-1", source: "initial-upload-1", target: "initial-prompt" },
+        { id: "conn-2", source: "initial-upload-2", target: "initial-prompt" },
+      ]);
+
+      toast.success("Board iniciado com nós de exemplo!");
     }
   };
 
