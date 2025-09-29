@@ -22,6 +22,8 @@ import { NodeCreationMenu } from "@/components/canvas/NodeCreationMenu";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
 
 const nodeTypes = {
   image_upload: ImageUploadNode,
@@ -38,6 +40,10 @@ const CanvasInner = () => {
   const [zoom, setZoom] = useState(1);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
   const isInitialLoadRef = useRef(true);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradeType, setUpgradeType] = useState<"node" | "board">("node");
+  
+  const { subscription, checkNodeLimit, upgradeToPro } = useSubscription();
 
   useEffect(() => {
     loadBoard();
@@ -269,6 +275,14 @@ const CanvasInner = () => {
   const handleCreateNode = async (type: "image_upload" | "prompt") => {
     if (!boardId) return;
 
+    // Check node limit
+    const limitCheck = await checkNodeLimit(boardId);
+    if (!limitCheck.canAdd) {
+      setUpgradeType("node");
+      setShowUpgradeModal(true);
+      return;
+    }
+
     const newNode: Node = {
       id: crypto.randomUUID(),
       type,
@@ -322,6 +336,14 @@ const CanvasInner = () => {
   };
 
   const handleGenerate = async (nodeId: string, prompt: string) => {
+    // Check node limit before generating (result node)
+    const limitCheck = await checkNodeLimit(boardId!);
+    if (!limitCheck.canAdd) {
+      setUpgradeType("node");
+      setShowUpgradeModal(true);
+      return;
+    }
+
     const sourceNodes = edges
       .filter((edge) => edge.target === nodeId)
       .map((edge) => nodes.find((n) => n.id === edge.source))
@@ -449,6 +471,17 @@ const CanvasInner = () => {
       </ReactFlow>
 
       <NodeCreationMenu onCreateNode={handleCreateNode} />
+      
+      <UpgradeModal
+        open={showUpgradeModal}
+        onOpenChange={setShowUpgradeModal}
+        onUpgrade={() => {
+          upgradeToPro();
+          setShowUpgradeModal(false);
+        }}
+        type={upgradeType}
+        limit={subscription?.plan === "pro" ? 30 : 7}
+      />
     </div>
   );
 };

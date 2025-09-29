@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Landing from "./pages/Landing";
 import Boards from "./pages/Boards";
 import Canvas from "./pages/Canvas";
+import Backoffice from "./pages/Backoffice";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/landing" element={<Landing />} />
           <Route path="/boards" element={<Boards />} />
           <Route path="/canvas/:boardId" element={<Canvas />} />
+          <Route path="/backoffice" element={<Backoffice />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

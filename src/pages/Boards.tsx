@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, LogOut } from "lucide-react";
 import { toast } from "sonner";
+import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
 
 interface Board {
   id: string;
@@ -28,6 +30,9 @@ const Boards = () => {
   const [newBoardName, setNewBoardName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  
+  const { subscription, checkBoardLimit, upgradeToPro } = useSubscription();
 
   useEffect(() => {
     loadBoards();
@@ -50,6 +55,13 @@ const Boards = () => {
   const createBoard = async () => {
     if (!newBoardName.trim()) {
       toast.error("Please enter a board name");
+      return;
+    }
+
+    // Check board limit
+    const limitCheck = await checkBoardLimit();
+    if (!limitCheck.canCreate) {
+      setShowUpgradeModal(true);
       return;
     }
 
@@ -159,6 +171,17 @@ const Boards = () => {
           ))}
         </div>
       </div>
+
+      <UpgradeModal
+        open={showUpgradeModal}
+        onOpenChange={setShowUpgradeModal}
+        onUpgrade={() => {
+          upgradeToPro();
+          setShowUpgradeModal(false);
+        }}
+        type="board"
+        limit={subscription?.plan === "pro" ? 999 : 2}
+      />
     </div>
   );
 };
