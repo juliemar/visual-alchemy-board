@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthForm } from "@/components/auth/AuthForm";
+import Landing from "./Landing";
 import { Loader2 } from "lucide-react";
 
 const Index = () => {
@@ -44,7 +45,7 @@ const Index = () => {
     return null;
   }
 
-  return <AuthForm />;
+  return <Landing />;
 };
 
 export default Index;
