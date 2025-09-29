@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Sparkles, Layers, Zap, Users } from "lucide-react";
 import { AuthDialog } from "@/components/landing/AuthDialog";
+import canvasDemo from "@/assets/canvas-demo.png";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -57,14 +58,11 @@ const Landing = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 blur-3xl" />
             <Card className="relative overflow-hidden border-2 shadow-2xl">
               <CardContent className="p-0">
-                <div className="aspect-video bg-gradient-to-br from-muted/50 to-muted flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <Layers className="h-20 w-20 mx-auto mb-4 text-primary" />
-                    <p className="text-muted-foreground">
-                      Canvas visual intuitivo com nós conectáveis
-                    </p>
-                  </div>
-                </div>
+                <img 
+                  src={canvasDemo} 
+                  alt="Canvas visual intuitivo com nós conectáveis para geração de imagens com IA"
+                  className="w-full h-auto"
+                />
               </CardContent>
             </Card>
           </div>
