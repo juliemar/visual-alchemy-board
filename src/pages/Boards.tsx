@@ -98,6 +98,7 @@ const Boards = () => {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     toast.success("Signed out successfully");
+    navigate("/");
   };
 
   return (
