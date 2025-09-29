@@ -305,6 +305,22 @@ const CanvasInner = () => {
     reader.readAsDataURL(file);
   };
 
+  const handleImageRemove = async (nodeId: string) => {
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === nodeId
+          ? { ...node, data: { ...node.data, imageUrl: undefined } }
+          : node
+      )
+    );
+
+    const node = nodes.find((n) => n.id === nodeId);
+    if (node) {
+      await saveNode({ ...node, data: { ...node.data, imageUrl: undefined } });
+      toast.success("Imagem removida!");
+    }
+  };
+
   const handleGenerate = async (nodeId: string, prompt: string) => {
     const sourceNodes = edges
       .filter((edge) => edge.target === nodeId)
@@ -411,6 +427,9 @@ const CanvasInner = () => {
             ...node.data,
             onImageUpload: node.type === "image_upload"
               ? (file: File) => handleImageUpload(node.id, file)
+              : undefined,
+            onImageRemove: node.type === "image_upload"
+              ? () => handleImageRemove(node.id)
               : undefined,
             onGenerate: node.type === "prompt"
               ? (prompt: string) => handleGenerate(node.id, prompt)
