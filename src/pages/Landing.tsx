@@ -4,11 +4,31 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Sparkles, Layers, Zap, Users } from "lucide-react";
 import { AuthDialog } from "@/components/landing/AuthDialog";
-import canvasDemo from "@/assets/canvas-demo.png";
+import { ImageUploadNode } from "@/components/canvas/ImageUploadNode";
+import { PromptNode } from "@/components/canvas/PromptNode";
 
 const Landing = () => {
   const navigate = useNavigate();
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [leftImage, setLeftImage] = useState<string | undefined>();
+  const [rightImage, setRightImage] = useState<string | undefined>();
+  const [prompt, setPrompt] = useState("");
+
+  const handleImageUpload = (file: File, position: 'left' | 'right') => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (position === 'left') {
+        setLeftImage(reader.result as string);
+      } else {
+        setRightImage(reader.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleGenerate = () => {
+    setAuthDialogOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-canvas-bg via-background to-canvas-bg">
@@ -52,17 +72,80 @@ const Landing = () => {
           </div>
         </div>
 
-        {/* Hero Image/Demo */}
-        <div className="mt-20 max-w-5xl mx-auto">
+        {/* Interactive Demo Board */}
+        <div className="mt-20 max-w-6xl mx-auto">
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 blur-3xl" />
-            <Card className="relative overflow-hidden border-2 shadow-2xl">
-              <CardContent className="p-0">
-                <img 
-                  src={canvasDemo} 
-                  alt="Canvas visual intuitivo com nós conectáveis para geração de imagens com IA"
-                  className="w-full h-auto"
-                />
+            <Card className="relative overflow-hidden border-2 shadow-2xl bg-canvas-bg">
+              <CardContent className="p-8 md:p-16">
+                <div className="relative min-h-[500px] flex items-center justify-center">
+                  {/* Left Image Upload */}
+                  <div className="absolute left-0 md:left-12 top-1/2 -translate-y-1/2 z-10">
+                    <ImageUploadNode
+                      data={{
+                        imageUrl: leftImage,
+                        onImageUpload: (file) => handleImageUpload(file, 'left'),
+                        onImageRemove: () => setLeftImage(undefined),
+                      }}
+                    />
+                  </div>
+
+                  {/* Center Prompt Node */}
+                  <div className="z-20">
+                    <PromptNode
+                      data={{
+                        prompt,
+                        onPromptChange: setPrompt,
+                        onGenerate: handleGenerate,
+                      }}
+                    />
+                  </div>
+
+                  {/* Right Image Upload */}
+                  <div className="absolute right-0 md:right-12 top-1/2 -translate-y-1/2 z-10">
+                    <ImageUploadNode
+                      data={{
+                        imageUrl: rightImage,
+                        onImageUpload: (file) => handleImageUpload(file, 'right'),
+                        onImageRemove: () => setRightImage(undefined),
+                      }}
+                    />
+                  </div>
+
+                  {/* Connection Lines */}
+                  <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
+                    <defs>
+                      <marker
+                        id="arrowhead"
+                        markerWidth="10"
+                        markerHeight="10"
+                        refX="9"
+                        refY="3"
+                        orient="auto"
+                      >
+                        <polygon points="0 0, 10 3, 0 6" fill="hsl(var(--primary))" />
+                      </marker>
+                    </defs>
+                    {/* Left to Center */}
+                    <path
+                      d="M 25% 50% Q 37.5% 50% 42% 50%"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth="2"
+                      fill="none"
+                      markerEnd="url(#arrowhead)"
+                      opacity="0.6"
+                    />
+                    {/* Right to Center */}
+                    <path
+                      d="M 75% 50% Q 62.5% 50% 58% 50%"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth="2"
+                      fill="none"
+                      markerEnd="url(#arrowhead)"
+                      opacity="0.6"
+                    />
+                  </svg>
+                </div>
               </CardContent>
             </Card>
           </div>
