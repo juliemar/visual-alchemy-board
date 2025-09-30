@@ -76,8 +76,10 @@ export const useCredits = () => {
         body: { node_id: nodeId }
       });
       
+      // Check for insufficient credits error (status 402)
       if (error) {
-        if (error.message === "Insufficient credits") {
+        const errorMessage = error.message || "";
+        if (errorMessage.includes("Insufficient credits") || error.context?.status === 402) {
           toast({
             title: "Créditos insuficientes",
             description: "Você precisa comprar mais créditos para baixar esta imagem.",
@@ -85,6 +87,7 @@ export const useCredits = () => {
           });
           return { success: false, needsAuth: false };
         }
+        console.error("Error consuming credit:", error);
         throw error;
       }
       
@@ -93,22 +96,26 @@ export const useCredits = () => {
           title: "Imagem já baixada",
           description: "Você já baixou esta imagem antes.",
         });
+        // Still return success so download proceeds
         return { success: true, needsAuth: false };
       }
 
       // Refresh credits after consumption
       await checkCredits();
       
-      toast({
-        title: "Crédito consumido",
-        description: `Novo saldo: ${data.new_balance} créditos`,
-      });
+      if (data?.new_balance !== undefined) {
+        toast({
+          title: "Crédito consumido",
+          description: `Novo saldo: ${data.new_balance} créditos`,
+        });
+      }
       
       return { success: true, needsAuth: false };
     } catch (error: any) {
+      console.error("Exception in consumeCredit:", error);
       toast({
         title: "Erro ao consumir crédito",
-        description: error.message,
+        description: error.message || "Erro desconhecido",
         variant: "destructive",
       });
       return { success: false, needsAuth: false };
