@@ -6,14 +6,17 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Sparkles } from "lucide-react";
+import { Node, Edge } from "@xyflow/react";
 
 interface FreemiumAuthModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+  canvasNodes?: Node[];
+  canvasEdges?: Edge[];
 }
 
-export const FreemiumAuthModal = ({ open, onOpenChange, onSuccess }: FreemiumAuthModalProps) => {
+export const FreemiumAuthModal = ({ open, onOpenChange, onSuccess, canvasNodes = [], canvasEdges = [] }: FreemiumAuthModalProps) => {
   const [isLogin, setIsLogin] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +33,7 @@ export const FreemiumAuthModal = ({ open, onOpenChange, onSuccess }: FreemiumAut
           password,
         });
         if (error) throw error;
-        toast.success("Login successful!");
+        toast.success("Login realizado com sucesso!");
       } else {
         const redirectUrl = `${window.location.origin}/`;
         const { error } = await supabase.auth.signUp({
@@ -41,7 +44,7 @@ export const FreemiumAuthModal = ({ open, onOpenChange, onSuccess }: FreemiumAut
           },
         });
         if (error) throw error;
-        toast.success("Account created! You can now create unlimited images!");
+        toast.success("Conta criada com sucesso!");
       }
       
       onSuccess();

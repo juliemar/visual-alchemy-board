@@ -104,6 +104,24 @@ const FreeCanvasInner = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+  const generateBoardName = (nodes: Node[]): string => {
+    // Encontrar prompts nos nodes
+    const promptNodes = nodes.filter(node => node.type === 'prompt' && node.data?.prompt);
+    
+    if (promptNodes.length === 0) {
+      return "Meu Canvas";
+    }
+    
+    // Pegar o primeiro prompt e gerar um nome baseado nele
+    const firstPrompt = promptNodes[0].data.prompt as string;
+    const words = firstPrompt.split(' ').slice(0, 5); // Primeiras 5 palavras
+    let name = words.join(' ');
+    if (name.length > 50) {
+      name = name.slice(0, 50) + '...';
+    }
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  };
+
   const migrateToRealBoard = async () => {
     if (nodes.length === 0) {
       navigate("/boards");
@@ -111,42 +129,78 @@ const FreeCanvasInner = () => {
     }
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const boardName = generateBoardName(nodes);
+
       // Criar board real
       const { data: boardData, error: boardError } = await supabase
         .from("boards")
-        .insert({ name: "My First Board", user_id: (await supabase.auth.getUser()).data.user?.id })
+        .insert({ name: boardName, user_id: user.id })
         .select()
         .single();
 
       if (boardError) throw boardError;
 
       // Migrar nós
-      for (const node of nodes) {
-        await supabase.from("nodes").insert({
+      if (nodes.length > 0) {
+        const nodesData = nodes.map((node) => ({
           id: node.id,
           board_id: boardData.id,
           node_type: node.type || 'image_upload',
           node_data: node.data as any,
           position_x: node.position.x,
           position_y: node.position.y,
-        });
+        }));
+
+        const { error: nodesError } = await supabase
+          .from("nodes")
+          .insert(nodesData);
+
+        if (nodesError) throw nodesError;
       }
 
       // Migrar conexões
-      for (const edge of edges) {
-        await supabase.from("connections").insert({
-          id: edge.id,
+      if (edges.length > 0) {
+        const connectionsData = edges.map((edge) => ({
           board_id: boardData.id,
           source_node_id: edge.source,
           target_node_id: edge.target,
-        });
+        }));
+
+        const { error: connectionsError } = await supabase
+          .from("connections")
+          .insert(connectionsData);
+
+        if (connectionsError) throw connectionsError;
       }
 
-      toast.success("Canvas saved! Welcome!");
+      // Gerar thumbnail
+      try {
+        const viewportElement = document.querySelector('.react-flow__viewport') as HTMLElement;
+        if (viewportElement) {
+          await generateBoardThumbnail(
+            boardData.id,
+            nodes,
+            async () => {
+              return await toPng(viewportElement, {
+                backgroundColor: '#ffffff',
+                quality: 0.8,
+              });
+            }
+          );
+        }
+      } catch (thumbError) {
+        console.error('Failed to generate thumbnail:', thumbError);
+      }
+
+      toast.success("Canvas salvo com sucesso!");
       localStorage.removeItem(STORAGE_KEY);
       navigate(`/canvas/${boardData.id}`);
     } catch (error) {
       console.error("Error migrating canvas:", error);
+      toast.error("Erro ao salvar canvas");
       navigate("/boards");
     }
   };
@@ -312,6 +366,9 @@ const FreeCanvasInner = () => {
             onGenerate: node.type === "prompt"
               ? (prompt: string) => handleGenerate(node.id, prompt)
               : undefined,
+            onAuthRequired: node.type === "generated_image"
+              ? () => setShowAuthModal(true)
+              : undefined,
           },
         }))}
         edges={edges}
@@ -331,87 +388,9 @@ const FreeCanvasInner = () => {
       <FreemiumAuthModal 
         open={showAuthModal} 
         onOpenChange={setShowAuthModal}
-        onSuccess={async () => {
-          try {
-            // Salvar canvas temporário como board real
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return;
-
-            // Criar novo board
-            const { data: boardData, error: boardError } = await supabase
-              .from("boards")
-              .insert({
-                name: "My First Board",
-                user_id: user.id,
-              })
-              .select()
-              .single();
-
-            if (boardError) throw boardError;
-
-            // Salvar todos os nós
-            if (nodes.length > 0) {
-              const nodesData = nodes.map((node) => ({
-                id: node.id,
-                board_id: boardData.id,
-                node_type: node.type,
-                position_x: node.position.x,
-                position_y: node.position.y,
-                node_data: node.data,
-              }));
-
-              const { error: nodesError } = await supabase
-                .from("nodes")
-                .insert(nodesData);
-
-              if (nodesError) throw nodesError;
-            }
-
-            // Salvar todas as conexões
-            if (edges.length > 0) {
-              const connectionsData = edges.map((edge) => ({
-                board_id: boardData.id,
-                source_node_id: edge.source,
-                target_node_id: edge.target,
-              }));
-
-              const { error: connectionsError } = await supabase
-                .from("connections")
-                .insert(connectionsData);
-
-              if (connectionsError) throw connectionsError;
-            }
-
-            // Gerar thumbnail
-            try {
-              const viewportElement = document.querySelector('.react-flow__viewport') as HTMLElement;
-              if (viewportElement) {
-                await generateBoardThumbnail(
-                  boardData.id,
-                  nodes,
-                  async () => {
-                    return await toPng(viewportElement, {
-                      backgroundColor: '#ffffff',
-                      quality: 0.8,
-                    });
-                  }
-                );
-              }
-            } catch (thumbError) {
-              console.error('Failed to generate thumbnail:', thumbError);
-            }
-
-            toast.success("Canvas saved successfully!");
-            
-            // Redirect to saved board
-            setTimeout(() => {
-              navigate(`/canvas/${boardData.id}`);
-            }, 1000);
-          } catch (error) {
-            console.error("Error saving canvas:", error);
-            toast.error("Error saving canvas");
-          }
-        }}
+        canvasNodes={nodes}
+        canvasEdges={edges}
+        onSuccess={migrateToRealBoard}
       />
     </div>
   );

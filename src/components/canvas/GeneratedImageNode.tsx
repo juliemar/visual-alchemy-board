@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useCredits } from "@/hooks/useCredits";
 import { CreditsPurchaseModal } from "@/components/credits/CreditsPurchaseModal";
-import { FreemiumAuthModal } from "@/components/canvas/FreemiumAuthModal";
 
 interface GeneratedImageNodeProps {
   data: {
     imageUrl?: string;
     isGenerating?: boolean;
+    onAuthRequired?: () => void;
   };
   id: string;
 }
@@ -17,7 +17,6 @@ interface GeneratedImageNodeProps {
 export const GeneratedImageNode = ({ data, id }: GeneratedImageNodeProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const { credits, consumeCredit } = useCredits();
 
   const handleDownload = async () => {
@@ -27,8 +26,10 @@ export const GeneratedImageNode = ({ data, id }: GeneratedImageNodeProps) => {
     const result = await consumeCredit(id);
     
     if (result.needsAuth) {
-      // User needs to authenticate
-      setShowAuthModal(true);
+      // User needs to authenticate - call the callback
+      if (data.onAuthRequired) {
+        data.onAuthRequired();
+      }
       return;
     }
     
@@ -64,7 +65,7 @@ export const GeneratedImageNode = ({ data, id }: GeneratedImageNodeProps) => {
         {data.isGenerating ? (
           <div className="flex flex-col items-center justify-center h-48 gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">Sending to AI...</p>
+            <p className="text-sm text-muted-foreground">Enviando para IA...</p>
           </div>
         ) : data.imageUrl ? (
           <div 
@@ -96,19 +97,10 @@ export const GeneratedImageNode = ({ data, id }: GeneratedImageNodeProps) => {
           </div>
         ) : (
           <div className="flex items-center justify-center h-48 text-muted-foreground">
-            <p className="text-sm">Waiting for generation...</p>
+            <p className="text-sm">Aguardando geração...</p>
           </div>
         )}
       </div>
-
-      <FreemiumAuthModal
-        open={showAuthModal}
-        onOpenChange={setShowAuthModal}
-        onSuccess={() => {
-          setShowAuthModal(false);
-          // After authentication, user can try to download again
-        }}
-      />
 
       <CreditsPurchaseModal
         open={showPurchaseModal}
