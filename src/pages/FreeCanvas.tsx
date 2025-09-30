@@ -125,20 +125,26 @@ const FreeCanvasInner = () => {
 
   const migrateToRealBoard = async () => {
     if (nodes.length === 0) {
+      console.log("[MIGRATE] No nodes to migrate, redirecting to boards");
       navigate("/boards");
       return;
     }
 
+    console.log("[MIGRATE] Starting migration with", nodes.length, "nodes and", edges.length, "edges");
     setIsMigrating(true);
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
+        console.error("[MIGRATE] No user found after authentication");
         setIsMigrating(false);
         return;
       }
 
+      console.log("[MIGRATE] User authenticated:", user.id);
+
       const boardName = generateBoardName(nodes);
+      console.log("[MIGRATE] Generated board name:", boardName);
 
       // Criar board real
       const { data: boardData, error: boardError } = await supabase
@@ -147,10 +153,16 @@ const FreeCanvasInner = () => {
         .select()
         .single();
 
-      if (boardError) throw boardError;
+      if (boardError) {
+        console.error("[MIGRATE] Board creation error:", boardError);
+        throw boardError;
+      }
+
+      console.log("[MIGRATE] Board created successfully:", boardData.id);
 
       // Migrar nós
       if (nodes.length > 0) {
+        console.log("[MIGRATE] Preparing to insert", nodes.length, "nodes");
         const nodesData = nodes.map((node) => ({
           id: node.id,
           board_id: boardData.id,
@@ -160,15 +172,23 @@ const FreeCanvasInner = () => {
           position_y: node.position.y,
         }));
 
+        console.log("[MIGRATE] Nodes data prepared:", JSON.stringify(nodesData, null, 2));
+
         const { error: nodesError } = await supabase
           .from("nodes")
           .insert(nodesData);
 
-        if (nodesError) throw nodesError;
+        if (nodesError) {
+          console.error("[MIGRATE] Nodes insertion error:", nodesError);
+          throw nodesError;
+        }
+
+        console.log("[MIGRATE] Nodes inserted successfully");
       }
 
       // Migrar conexões
       if (edges.length > 0) {
+        console.log("[MIGRATE] Preparing to insert", edges.length, "connections");
         const connectionsData = edges.map((edge) => ({
           board_id: boardData.id,
           source_node_id: edge.source,
@@ -179,11 +199,17 @@ const FreeCanvasInner = () => {
           .from("connections")
           .insert(connectionsData);
 
-        if (connectionsError) throw connectionsError;
+        if (connectionsError) {
+          console.error("[MIGRATE] Connections insertion error:", connectionsError);
+          throw connectionsError;
+        }
+
+        console.log("[MIGRATE] Connections inserted successfully");
       }
 
       // Gerar thumbnail
       try {
+        console.log("[MIGRATE] Generating thumbnail");
         const viewportElement = document.querySelector('.react-flow__viewport') as HTMLElement;
         if (viewportElement) {
           await generateBoardThumbnail(
@@ -196,21 +222,26 @@ const FreeCanvasInner = () => {
               });
             }
           );
+          console.log("[MIGRATE] Thumbnail generated successfully");
+        } else {
+          console.warn("[MIGRATE] Viewport element not found, skipping thumbnail");
         }
       } catch (thumbError) {
-        console.error('Failed to generate thumbnail:', thumbError);
+        console.error('[MIGRATE] Failed to generate thumbnail:', thumbError);
+        // Continue even if thumbnail fails
       }
 
       toast.success("Canvas saved successfully!");
       localStorage.removeItem(STORAGE_KEY);
       
+      console.log("[MIGRATE] Migration complete, navigating to board:", boardData.id);
       // Navigate without removing loading - let the Canvas page handle it
       navigate(`/canvas/${boardData.id}`);
     } catch (error) {
-      console.error("Error migrating canvas:", error);
-      toast.error("Error saving canvas");
+      console.error("[MIGRATE] Migration failed:", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      toast.error(`Error saving canvas: ${errorMessage}`);
       setIsMigrating(false);
-      navigate("/boards");
     }
   };
 

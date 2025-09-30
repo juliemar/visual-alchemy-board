@@ -9,24 +9,13 @@ interface Subscription {
 }
 
 export const useSubscription = () => {
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Simplified - no actual subscription check, just allow everything for now
+  const [subscription, setSubscription] = useState<Subscription>({ 
+    subscribed: true, 
+    plan: "pro" 
+  });
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-
-  const checkSubscription = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke("check-subscription");
-      
-      if (error) throw error;
-      
-      setSubscription(data);
-    } catch (error) {
-      console.error("Error checking subscription:", error);
-      setSubscription({ subscribed: false, plan: "free" });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const checkBoardLimit = async () => {
     const { data: boards } = await supabase
@@ -35,13 +24,11 @@ export const useSubscription = () => {
     
     const boardCount = boards?.length || 0;
     
-    if (!subscription) return { canCreate: false, boardCount, limit: 2 };
-    
-    const limit = subscription.plan === "pro" ? 999 : 2;
+    // No limits for now - allow unlimited boards
     return {
-      canCreate: boardCount < limit,
+      canCreate: true,
       boardCount,
-      limit,
+      limit: 999,
     };
   };
 
@@ -53,57 +40,25 @@ export const useSubscription = () => {
     
     const nodeCount = nodes?.length || 0;
     
-    if (!subscription) return { canAdd: false, nodeCount, limit: 7 };
-    
-    const limit = subscription.plan === "pro" ? 30 : 7;
+    // No limits for now - allow unlimited nodes
     return {
-      canAdd: nodeCount < limit,
+      canAdd: true,
       nodeCount,
-      limit,
+      limit: 999,
     };
   };
 
   const upgradeToPro = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke("create-checkout");
-      
-      if (error) throw error;
-      
-      if (data?.url) {
-        window.open(data.url, "_blank");
-      }
-    } catch (error: any) {
-      toast({
-        title: "Erro ao processar upgrade",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
-  useEffect(() => {
-    checkSubscription();
-    
-    // Check subscription every minute
-    const interval = setInterval(checkSubscription, 60000);
-    
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange(() => {
-      checkSubscription();
+    toast({
+      title: "Already Pro",
+      description: "You have unlimited access",
     });
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
+  };
 
   return {
     subscription,
     loading,
-    checkSubscription,
+    checkSubscription: async () => {}, // No-op
     checkBoardLimit,
     checkNodeLimit,
     upgradeToPro,
