@@ -133,7 +133,10 @@ const FreeCanvasInner = () => {
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        setIsMigrating(false);
+        return;
+      }
 
       const boardName = generateBoardName(nodes);
 
@@ -201,10 +204,8 @@ const FreeCanvasInner = () => {
       toast.success("Canvas saved successfully!");
       localStorage.removeItem(STORAGE_KEY);
       
-      // Small delay to show the success message
-      setTimeout(() => {
-        navigate(`/canvas/${boardData.id}`);
-      }, 500);
+      // Navigate without removing loading - let the Canvas page handle it
+      navigate(`/canvas/${boardData.id}`);
     } catch (error) {
       console.error("Error migrating canvas:", error);
       toast.error("Error saving canvas");

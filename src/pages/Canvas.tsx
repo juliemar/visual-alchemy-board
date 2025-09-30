@@ -21,7 +21,7 @@ import { GeneratedImageNode } from "@/components/canvas/GeneratedImageNode";
 import { CanvasToolbar } from "@/components/canvas/CanvasToolbar";
 import { NodeCreationMenu } from "@/components/canvas/NodeCreationMenu";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
@@ -42,6 +42,7 @@ const CanvasInner = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [boardName, setBoardName] = useState("");
   const [zoom, setZoom] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
   const thumbnailTimeoutRef = useRef<NodeJS.Timeout>();
   const isInitialLoadRef = useRef(true);
@@ -57,6 +58,8 @@ const CanvasInner = () => {
   const loadBoard = async () => {
     if (!boardId) return;
 
+    setIsLoading(true);
+
     const { data: boardData, error: boardError } = await supabase
       .from("boards")
       .select("*")
@@ -66,6 +69,7 @@ const CanvasInner = () => {
     if (boardError || !boardData) {
       toast.error("Failed to load board");
       navigate("/boards");
+      setIsLoading(false);
       return;
     }
 
@@ -163,6 +167,11 @@ const CanvasInner = () => {
     }
     
     isInitialLoadRef.current = false;
+    
+    // Small delay to ensure everything is rendered
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 300);
   };
 
   const saveNode = async (node: Node) => {
@@ -475,6 +484,16 @@ const CanvasInner = () => {
 
   return (
     <div className="h-screen w-screen">
+      {isLoading && (
+        <div className="absolute inset-0 bg-background z-50 flex flex-col items-center justify-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl font-bold">Loading board...</h2>
+            <p className="text-muted-foreground">Please wait while we load your workspace</p>
+          </div>
+        </div>
+      )}
+
       <div className="absolute top-4 left-4 z-10 flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => navigate("/boards")}>
           <ArrowLeft className="h-5 w-5" />
