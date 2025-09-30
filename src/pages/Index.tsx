@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { AuthForm } from "@/components/auth/AuthForm";
-import Landing from "./Landing";
+import FreeCanvas from "./FreeCanvas";
 import { Loader2 } from "lucide-react";
 
 const Index = () => {
@@ -45,7 +44,7 @@ const Index = () => {
     return null;
   }
 
-  return <Landing />;
+  return <FreeCanvas />;
 };
 
 export default Index;
