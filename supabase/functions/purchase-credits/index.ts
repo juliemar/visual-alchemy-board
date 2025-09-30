@@ -7,12 +7,12 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Price IDs for different credit packages
+// Price IDs for different credit packages (BRL)
 const CREDIT_PACKAGES = {
-  1: "price_1SD6eZG4mM3nmafDrrd5hAZi",   // $1.00 - 1 credit
-  5: "price_1SD6epG4mM3nmafDYUXR4cpW",   // $4.50 - 5 credits
-  10: "price_1SD6f3G4mM3nmafDLTNAdwuL",  // $8.00 - 10 credits
-  100: "price_1SD6fDG4mM3nmafDnkqOWh29", // $70.00 - 100 credits
+  1: "price_1SD9HDG4mM3nmafDFCIiXYw2",   // R$1,00 - 1 credit
+  5: "price_1SD9HPG4mM3nmafDMGU29YOF",   // R$4,50 - 5 credits
+  10: "price_1SD9I5G4mM3nmafDOm3ROUYw",  // R$8,00 - 10 credits
+  100: "price_1SD9IHG4mM3nmafDozy7Wc4K", // R$70,00 - 100 credits
 };
 
 serve(async (req) => {

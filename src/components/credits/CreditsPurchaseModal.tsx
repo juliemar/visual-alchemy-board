@@ -47,6 +47,10 @@ const PACKAGES = [
   },
 ];
 
+const formatBRL = (value: number) => {
+  return `R$ ${value.toFixed(2).replace('.', ',')}`;
+};
+
 export const CreditsPurchaseModal = ({
   open,
   onOpenChange,
@@ -100,7 +104,7 @@ export const CreditsPurchaseModal = ({
                     </span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">
-                    ${pkg.pricePerCredit.toFixed(2)} per credit
+                    {formatBRL(pkg.pricePerCredit)} per credit
                   </p>
                 </div>
 
@@ -112,7 +116,7 @@ export const CreditsPurchaseModal = ({
               </div>
 
               <div className="text-3xl font-bold mb-4">
-                ${pkg.price.toFixed(2)}
+                {formatBRL(pkg.price)}
               </div>
 
               <Button

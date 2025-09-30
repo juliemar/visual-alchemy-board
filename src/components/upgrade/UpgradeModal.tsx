@@ -45,8 +45,8 @@ export const UpgradeModal = ({
             <div className="text-center mb-4">
               <h3 className="text-2xl font-bold mb-2">Pro Plan</h3>
               <div className="text-4xl font-bold text-primary mb-1">
-                $19.90
-                <span className="text-lg font-normal text-muted-foreground">/month</span>
+                R$ 19,90
+                <span className="text-lg font-normal text-muted-foreground">/mês</span>
               </div>
             </div>
 
