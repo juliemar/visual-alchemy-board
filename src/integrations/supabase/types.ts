@@ -87,10 +87,56 @@ export type Database = {
           },
         ]
       }
+      credit_transactions: {
+        Row: {
+          created_at: string | null
+          credits_amount: number
+          credits_balance_after: number
+          id: string
+          image_node_id: string | null
+          metadata: Json | null
+          stripe_payment_intent_id: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          credits_amount: number
+          credits_balance_after: number
+          id?: string
+          image_node_id?: string | null
+          metadata?: Json | null
+          stripe_payment_intent_id?: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          credits_amount?: number
+          credits_balance_after?: number
+          id?: string
+          image_node_id?: string | null
+          metadata?: Json | null
+          stripe_payment_intent_id?: string | null
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_transactions_image_node_id_fkey"
+            columns: ["image_node_id"]
+            isOneToOne: false
+            referencedRelation: "nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       nodes: {
         Row: {
           board_id: string
           created_at: string | null
+          downloaded_at: string | null
+          downloaded_by: string | null
           id: string
           node_data: Json | null
           node_type: string
@@ -100,6 +146,8 @@ export type Database = {
         Insert: {
           board_id: string
           created_at?: string | null
+          downloaded_at?: string | null
+          downloaded_by?: string | null
           id?: string
           node_data?: Json | null
           node_type: string
@@ -109,6 +157,8 @@ export type Database = {
         Update: {
           board_id?: string
           created_at?: string | null
+          downloaded_at?: string | null
+          downloaded_by?: string | null
           id?: string
           node_data?: Json | null
           node_type?: string
@@ -156,6 +206,36 @@ export type Database = {
           status?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_credits: {
+        Row: {
+          created_at: string | null
+          credits_balance: number
+          id: string
+          total_credits_purchased: number
+          total_images_downloaded: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          credits_balance?: number
+          id?: string
+          total_credits_purchased?: number
+          total_images_downloaded?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          credits_balance?: number
+          id?: string
+          total_credits_purchased?: number
+          total_images_downloaded?: number
           updated_at?: string | null
           user_id?: string
         }
