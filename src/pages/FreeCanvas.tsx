@@ -34,7 +34,7 @@ const nodeTypes = {
 };
 
 const STORAGE_KEY = "free_generations_count";
-const MAX_FREE_GENERATIONS = 1;
+const MAX_FREE_GENERATIONS = 5;
 
 const FreeCanvasInner = () => {
   const navigate = useNavigate();
