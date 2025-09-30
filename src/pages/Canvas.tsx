@@ -163,7 +163,7 @@ const CanvasInner = () => {
         { id: initialConnections[1].id, source: initialNodes[1].id, target: initialNodes[2].id },
       ]);
 
-      toast.success("Board iniciado com nós de exemplo!");
+      toast.success("Board initialized with example nodes!");
     }
     
     isInitialLoadRef.current = false;
@@ -317,7 +317,7 @@ const CanvasInner = () => {
       });
 
       if (!error) {
-        toast.success("Conexão criada e salva!");
+        toast.success("Connection created and saved!");
       }
     },
     [boardId]
@@ -345,7 +345,7 @@ const CanvasInner = () => {
     
     // Salvar novo nó imediatamente
     await saveNode(newNode);
-    toast.success("Nó criado e salvo!");
+    toast.success("Node created and saved!");
   };
 
   const handleImageUpload = async (nodeId: string, file: File) => {
@@ -364,7 +364,7 @@ const CanvasInner = () => {
       const node = nodes.find((n) => n.id === nodeId);
       if (node) {
         await saveNode({ ...node, data: { ...node.data, imageUrl: base64 } });
-        toast.success("Imagem carregada e salva!");
+        toast.success("Image uploaded and saved!");
       }
     };
     reader.readAsDataURL(file);
@@ -382,7 +382,7 @@ const CanvasInner = () => {
     const node = nodes.find((n) => n.id === nodeId);
     if (node) {
       await saveNode({ ...node, data: { ...node.data, imageUrl: undefined } });
-      toast.success("Imagem removida!");
+      toast.success("Image removed!");
     }
   };
 

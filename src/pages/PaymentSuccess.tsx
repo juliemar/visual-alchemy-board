@@ -19,8 +19,8 @@ export default function PaymentSuccess() {
       
       if (!sessionId) {
         toast({
-          title: "Erro",
-          description: "ID de sessão não encontrado",
+          title: "Error",
+          description: "Session ID not found",
           variant: "destructive",
         });
         navigate("/");
@@ -38,13 +38,13 @@ export default function PaymentSuccess() {
         setNewBalance(data.new_balance);
         
         toast({
-          title: "Pagamento confirmado!",
-          description: `${data.credits_added} créditos adicionados à sua conta`,
+          title: "Payment confirmed!",
+          description: `${data.credits_added} credits added to your account`,
         });
       } catch (error: any) {
         console.error("Error verifying payment:", error);
         toast({
-          title: "Erro ao verificar pagamento",
+          title: "Error verifying payment",
           description: error.message,
           variant: "destructive",
         });
