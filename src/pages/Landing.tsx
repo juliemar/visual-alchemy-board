@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Sparkles, Layers, Zap, Users } from "lucide-react";
 import { AuthDialog } from "@/components/landing/AuthDialog";
-import { ImageUploadNode } from "@/components/canvas/ImageUploadNode";
-import { PromptNode } from "@/components/canvas/PromptNode";
+import { DemoImageUploadNode } from "@/components/landing/DemoImageUploadNode";
+import { DemoPromptNode } from "@/components/landing/DemoPromptNode";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -81,34 +81,28 @@ const Landing = () => {
                 <div className="relative min-h-[500px] flex items-center justify-center">
                   {/* Left Image Upload */}
                   <div className="absolute left-0 md:left-12 top-1/2 -translate-y-1/2 z-10">
-                    <ImageUploadNode
-                      data={{
-                        imageUrl: leftImage,
-                        onImageUpload: (file) => handleImageUpload(file, 'left'),
-                        onImageRemove: () => setLeftImage(undefined),
-                      }}
+                    <DemoImageUploadNode
+                      imageUrl={leftImage}
+                      onImageUpload={(file) => handleImageUpload(file, 'left')}
+                      onImageRemove={() => setLeftImage(undefined)}
                     />
                   </div>
 
                   {/* Center Prompt Node */}
                   <div className="z-20">
-                    <PromptNode
-                      data={{
-                        prompt,
-                        onPromptChange: setPrompt,
-                        onGenerate: handleGenerate,
-                      }}
+                    <DemoPromptNode
+                      prompt={prompt}
+                      onPromptChange={setPrompt}
+                      onGenerate={handleGenerate}
                     />
                   </div>
 
                   {/* Right Image Upload */}
                   <div className="absolute right-0 md:right-12 top-1/2 -translate-y-1/2 z-10">
-                    <ImageUploadNode
-                      data={{
-                        imageUrl: rightImage,
-                        onImageUpload: (file) => handleImageUpload(file, 'right'),
-                        onImageRemove: () => setRightImage(undefined),
-                      }}
+                    <DemoImageUploadNode
+                      imageUrl={rightImage}
+                      onImageUpload={(file) => handleImageUpload(file, 'right')}
+                      onImageRemove={() => setRightImage(undefined)}
                     />
                   </div>
 
