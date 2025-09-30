@@ -122,26 +122,26 @@ const Landing = () => {
                         refY="4"
                         orient="auto"
                       >
-                        <polygon points="0 0, 8 4, 0 8" fill="hsl(var(--primary))" opacity="0.6" />
+                        <polygon points="0 0, 8 4, 0 8" fill="hsl(var(--primary))" opacity="0.8" />
                       </marker>
                     </defs>
-                    {/* Top upload to prompt */}
+                    {/* Top upload to prompt - curved line */}
                     <path
-                      d="M 30% 35% Q 40% 35% 47% 43%"
+                      d="M 280 200 Q 350 200, 420 300"
                       stroke="hsl(var(--primary))"
-                      strokeWidth="2"
+                      strokeWidth="2.5"
                       fill="none"
                       markerEnd="url(#arrowhead-demo)"
-                      opacity="0.6"
+                      opacity="0.7"
                     />
-                    {/* Bottom upload to prompt */}
+                    {/* Bottom upload to prompt - curved line */}
                     <path
-                      d="M 30% 65% Q 40% 65% 47% 57%"
+                      d="M 280 400 Q 350 400, 420 350"
                       stroke="hsl(var(--primary))"
-                      strokeWidth="2"
+                      strokeWidth="2.5"
                       fill="none"
                       markerEnd="url(#arrowhead-demo)"
-                      opacity="0.6"
+                      opacity="0.7"
                     />
                   </svg>
                 </div>
