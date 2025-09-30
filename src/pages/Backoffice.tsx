@@ -51,7 +51,7 @@ const Backoffice = () => {
         .single();
 
       if (!roleData) {
-        toast.error("Acesso negado. Apenas administradores podem acessar esta área.");
+        toast.error("Access denied. Only administrators can access this area.");
         navigate("/boards");
         return;
       }
@@ -59,7 +59,7 @@ const Backoffice = () => {
       setIsAdmin(true);
       loadUsers();
     } catch (error) {
-      toast.error("Erro ao verificar permissões");
+      toast.error("Error verifying permissions");
       navigate("/boards");
     }
   };
@@ -102,7 +102,7 @@ const Backoffice = () => {
       setUsers(usersData);
     } catch (error) {
       console.error("Error loading users:", error);
-      toast.error("Erro ao carregar usuários");
+      toast.error("Error loading users");
     } finally {
       setLoading(false);
     }
@@ -135,16 +135,16 @@ const Backoffice = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Gerenciamento de Usuários</CardTitle>
+            <CardTitle>User Management</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Email</TableHead>
-                  <TableHead>Total de Boards</TableHead>
-                  <TableHead>Plano</TableHead>
-                  <TableHead>Data de Cadastro</TableHead>
+                  <TableHead>Total Boards</TableHead>
+                  <TableHead>Plan</TableHead>
+                  <TableHead>Registration Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -158,7 +158,7 @@ const Backoffice = () => {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {new Date(user.created_at).toLocaleDateString("pt-BR")}
+                      {new Date(user.created_at).toLocaleDateString("en-US")}
                     </TableCell>
                   </TableRow>
                 ))}

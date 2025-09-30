@@ -30,7 +30,7 @@ export const FreemiumAuthModal = ({ open, onOpenChange, onSuccess }: FreemiumAut
           password,
         });
         if (error) throw error;
-        toast.success("Login realizado com sucesso!");
+        toast.success("Login successful!");
       } else {
         const redirectUrl = `${window.location.origin}/`;
         const { error } = await supabase.auth.signUp({
@@ -41,7 +41,7 @@ export const FreemiumAuthModal = ({ open, onOpenChange, onSuccess }: FreemiumAut
           },
         });
         if (error) throw error;
-        toast.success("Conta criada! Você agora pode criar quantas imagens quiser!");
+        toast.success("Account created! You can now create unlimited images!");
       }
       
       onSuccess();
@@ -59,13 +59,13 @@ export const FreemiumAuthModal = ({ open, onOpenChange, onSuccess }: FreemiumAut
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-2xl">
             <Sparkles className="h-6 w-6 text-primary" />
-            Continue criando imagens incríveis!
+            Keep creating amazing images!
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
           <p className="text-muted-foreground">
-            Você usou sua geração grátis. {isLogin ? "Entre" : "Cadastre-se"} para criar quantas imagens quiser!
+            You've used your free generation. {isLogin ? "Sign in" : "Sign up"} to create unlimited images!
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -74,7 +74,7 @@ export const FreemiumAuthModal = ({ open, onOpenChange, onSuccess }: FreemiumAut
               <Input
                 id="email"
                 type="email"
-                placeholder="seu@email.com"
+                placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -83,7 +83,7 @@ export const FreemiumAuthModal = ({ open, onOpenChange, onSuccess }: FreemiumAut
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -100,10 +100,10 @@ export const FreemiumAuthModal = ({ open, onOpenChange, onSuccess }: FreemiumAut
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isLogin ? "Entrando..." : "Criando conta..."}
+                  {isLogin ? "Signing in..." : "Creating account..."}
                 </>
               ) : (
-                <>{isLogin ? "Entrar" : "Criar conta grátis"}</>
+                <>{isLogin ? "Sign In" : "Create Free Account"}</>
               )}
             </Button>
           </form>
@@ -115,7 +115,7 @@ export const FreemiumAuthModal = ({ open, onOpenChange, onSuccess }: FreemiumAut
               className="text-sm text-primary hover:underline"
               disabled={loading}
             >
-              {isLogin ? "Não tem conta? Cadastre-se" : "Já tem conta? Entre"}
+              {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
             </button>
           </div>
         </div>

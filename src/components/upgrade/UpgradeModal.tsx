@@ -31,41 +31,41 @@ export const UpgradeModal = ({
         <DialogHeader>
           <DialogTitle className="text-2xl flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-primary" />
-            Upgrade para Pro
+            Upgrade to Pro
           </DialogTitle>
           <DialogDescription>
             {type === "board"
-              ? `Você atingiu o limite de ${limit} boards. Atualize para criar boards ilimitados!`
-              : `Você atingiu o limite de ${limit} objetos neste board. Atualize para adicionar até 30 objetos por board!`}
+              ? `You've reached the limit of ${limit} boards. Upgrade to create unlimited boards!`
+              : `You've reached the limit of ${limit} objects in this board. Upgrade to add up to 30 objects per board!`}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 my-4">
           <div className="bg-primary/10 border-2 border-primary rounded-lg p-6">
             <div className="text-center mb-4">
-              <h3 className="text-2xl font-bold mb-2">Plano Pro</h3>
+              <h3 className="text-2xl font-bold mb-2">Pro Plan</h3>
               <div className="text-4xl font-bold text-primary mb-1">
-                R$ 19,90
-                <span className="text-lg font-normal text-muted-foreground">/mês</span>
+                $19.90
+                <span className="text-lg font-normal text-muted-foreground">/month</span>
               </div>
             </div>
 
             <ul className="space-y-3">
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span>Até 30 objetos por board</span>
+                <span>Up to 30 objects per board</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span>Boards ilimitados</span>
+                <span>Unlimited boards</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span>Geração ilimitada de imagens</span>
+                <span>Unlimited image generation</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span>Suporte prioritário</span>
+                <span>Priority support</span>
               </li>
             </ul>
           </div>
@@ -77,11 +77,11 @@ export const UpgradeModal = ({
             onClick={() => onOpenChange(false)}
             className="flex-1"
           >
-            Agora não
+            Not Now
           </Button>
           <Button onClick={onUpgrade} className="flex-1">
             <Sparkles className="mr-2 h-4 w-4" />
-            Fazer Upgrade
+            Upgrade Now
           </Button>
         </div>
       </DialogContent>

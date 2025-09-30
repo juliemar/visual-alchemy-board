@@ -114,7 +114,7 @@ const FreeCanvasInner = () => {
       // Criar board real
       const { data: boardData, error: boardError } = await supabase
         .from("boards")
-        .insert({ name: "Meu Primeiro Board", user_id: (await supabase.auth.getUser()).data.user?.id })
+        .insert({ name: "My First Board", user_id: (await supabase.auth.getUser()).data.user?.id })
         .select()
         .single();
 
@@ -142,7 +142,7 @@ const FreeCanvasInner = () => {
         });
       }
 
-      toast.success("Canvas salvo! Bem-vindo!");
+      toast.success("Canvas saved! Welcome!");
       localStorage.removeItem(STORAGE_KEY);
       navigate(`/canvas/${boardData.id}`);
     } catch (error) {
@@ -154,7 +154,7 @@ const FreeCanvasInner = () => {
   const onConnect = useCallback(
     (connection: Connection) => {
       setEdges((eds) => addEdge(connection, eds));
-      toast.success("Conexão criada!");
+      toast.success("Connection created!");
     },
     []
   );
@@ -168,7 +168,7 @@ const FreeCanvasInner = () => {
     };
 
     setNodes((nds) => [...nds, newNode]);
-    toast.success("Nó criado!");
+    toast.success("Node created!");
   };
 
   const handleImageUpload = (nodeId: string, file: File) => {
@@ -182,7 +182,7 @@ const FreeCanvasInner = () => {
             : node
         )
       );
-      toast.success("Imagem carregada!");
+      toast.success("Image uploaded!");
     };
     reader.readAsDataURL(file);
   };
@@ -195,7 +195,7 @@ const FreeCanvasInner = () => {
           : node
       )
     );
-    toast.success("Imagem removida!");
+    toast.success("Image removed!");
   };
 
   const handleGenerate = async (nodeId: string, prompt: string) => {
@@ -211,7 +211,7 @@ const FreeCanvasInner = () => {
       .filter((node) => node?.data?.imageUrl);
 
     if (sourceNodes.length === 0) {
-      toast.error("Conecte pelo menos uma imagem para gerar");
+      toast.error("Connect at least one image to generate");
       return;
     }
 
@@ -267,9 +267,9 @@ const FreeCanvasInner = () => {
       setGenerationsCount(newCount);
       localStorage.setItem(STORAGE_KEY, newCount.toString());
 
-      toast.success("Imagem gerada! Cadastre-se para criar mais!");
+      toast.success("Image generated! Sign up to create more!");
     } catch (error: any) {
-      toast.error(error.message || "Falha ao gerar imagem");
+      toast.error(error.message || "Failed to generate image");
       setNodes((nds) => nds.filter((n) => n.id !== resultNodeId));
       setNodes((nds) =>
         nds.map((node) =>
@@ -286,16 +286,16 @@ const FreeCanvasInner = () => {
   return (
     <div className="h-screen w-screen">
       <div className="absolute top-4 left-4 z-10 flex items-center gap-4">
-        <h1 className="text-2xl font-bold">Experimente Grátis</h1>
+        <h1 className="text-2xl font-bold">Try for Free</h1>
         <div className="bg-primary/10 px-3 py-1 rounded-full text-sm">
-          {remainingGenerations} imagem grátis restante
+          {remainingGenerations} free {remainingGenerations === 1 ? 'image' : 'images'} remaining
         </div>
       </div>
 
       <div className="absolute top-4 right-4 z-10">
         <Button onClick={() => setShowAuthModal(true)} variant="outline">
           <LogIn className="mr-2 h-4 w-4" />
-          Entrar / Cadastrar
+          Sign In / Sign Up
         </Button>
       </div>
 
@@ -344,7 +344,7 @@ const FreeCanvasInner = () => {
             const { data: boardData, error: boardError } = await supabase
               .from("boards")
               .insert({
-                name: "Meu Primeiro Board",
+                name: "My First Board",
                 user_id: user.id,
               })
               .select()
@@ -404,15 +404,15 @@ const FreeCanvasInner = () => {
               console.error('Failed to generate thumbnail:', thumbError);
             }
 
-            toast.success("Canvas salvo com sucesso!");
+            toast.success("Canvas saved successfully!");
             
-            // Redirecionar para o board salvo
+            // Redirect to saved board
             setTimeout(() => {
               navigate(`/canvas/${boardData.id}`);
             }, 1000);
           } catch (error) {
-            console.error("Erro ao salvar canvas:", error);
-            toast.error("Erro ao salvar canvas");
+            console.error("Error saving canvas:", error);
+            toast.error("Error saving canvas");
           }
         }}
       />

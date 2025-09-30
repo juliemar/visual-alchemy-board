@@ -41,12 +41,12 @@ const Landing = () => {
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-            Crie Imagens Incríveis com IA
+            Create Amazing Images with AI
           </h1>
           
           <p className="text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed">
-            Conecte múltiplas imagens e prompts em um canvas visual. 
-            Deixe a IA criar composições únicas combinando suas referências.
+            Connect multiple images and prompts in a visual canvas. 
+            Let AI create unique compositions combining your references.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -55,7 +55,7 @@ const Landing = () => {
               className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-shadow"
               onClick={() => setAuthDialogOpen(true)}
             >
-              Começar Grátis
+              Start Free
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button
@@ -67,7 +67,7 @@ const Landing = () => {
                 featuresEl?.scrollIntoView({ behavior: "smooth" });
               }}
             >
-              Ver Como Funciona
+              See How It Works
             </Button>
           </div>
         </div>
@@ -156,10 +156,10 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Poder e Simplicidade
+              Power and Simplicity
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Tudo que você precisa para criar imagens únicas com IA
+              Everything you need to create unique AI images
             </p>
           </div>
 
@@ -169,10 +169,10 @@ const Landing = () => {
                 <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                   <Layers className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3">Canvas Visual</h3>
+                <h3 className="text-2xl font-bold mb-3">Visual Canvas</h3>
                 <p className="text-muted-foreground">
-                  Sistema de nós intuitivo. Conecte imagens e prompts visualmente 
-                  para criar composições complexas.
+                  Intuitive node system. Connect images and prompts visually 
+                  to create complex compositions.
                 </p>
               </CardContent>
             </Card>
@@ -182,10 +182,10 @@ const Landing = () => {
                 <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                   <Zap className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3">IA Poderosa</h3>
+                <h3 className="text-2xl font-bold mb-3">Powerful AI</h3>
                 <p className="text-muted-foreground">
-                  Powered by Google Gemini. Gere imagens combinando 
-                  múltiplas referências com prompts personalizados.
+                  Powered by Google Gemini. Generate images combining 
+                  multiple references with custom prompts.
                 </p>
               </CardContent>
             </Card>
@@ -195,10 +195,10 @@ const Landing = () => {
                 <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                   <Users className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3">Boards Salvos</h3>
+                <h3 className="text-2xl font-bold mb-3">Saved Boards</h3>
                 <p className="text-muted-foreground">
-                  Organize projetos em boards. Seu trabalho é salvo 
-                  automaticamente e pode ser retomado a qualquer momento.
+                  Organize projects in boards. Your work is saved 
+                  automatically and can be resumed anytime.
                 </p>
               </CardContent>
             </Card>
@@ -211,10 +211,10 @@ const Landing = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Como Funciona
+              How It Works
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Crie imagens incríveis em 4 passos simples
+              Create amazing images in 4 simple steps
             </p>
           </div>
 
@@ -222,23 +222,23 @@ const Landing = () => {
             {[
               {
                 step: "01",
-                title: "Crie um Board",
-                description: "Comece criando um novo board para seu projeto. Dê um nome e organize suas ideias.",
+                title: "Create a Board",
+                description: "Start by creating a new board for your project. Give it a name and organize your ideas.",
               },
               {
                 step: "02",
-                title: "Adicione Imagens",
-                description: "Carregue múltiplas imagens de referência usando nós de upload. Quantas você quiser!",
+                title: "Add Images",
+                description: "Upload multiple reference images using upload nodes. As many as you want!",
               },
               {
                 step: "03",
-                title: "Conecte e Escreva",
-                description: "Conecte suas imagens a um nó de prompt. Descreva o que você quer criar combinando as referências.",
+                title: "Connect and Write",
+                description: "Connect your images to a prompt node. Describe what you want to create by combining the references.",
               },
               {
                 step: "04",
-                title: "Gere com IA",
-                description: "Clique em gerar e veja a mágica acontecer. A IA cria uma nova imagem única baseada em suas referências.",
+                title: "Generate with AI",
+                description: "Click generate and watch the magic happen. AI creates a unique new image based on your references.",
               },
             ].map((item, index) => (
               <div key={index} className="flex gap-6 items-start">
@@ -261,18 +261,18 @@ const Landing = () => {
       <section className="py-24 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Pronto para Criar?
+            Ready to Create?
           </h2>
           <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-            Junte-se a criadores que estão usando IA para gerar imagens únicas. 
-            Comece gratuitamente hoje.
+            Join creators who are using AI to generate unique images. 
+            Start free today.
           </p>
           <Button
             size="lg"
             className="text-lg px-10 py-6 shadow-lg hover:shadow-xl transition-shadow"
             onClick={() => setAuthDialogOpen(true)}
           >
-            Criar Minha Primeira Imagem
+            Create My First Image
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
