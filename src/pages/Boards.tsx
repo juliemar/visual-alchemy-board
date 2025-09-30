@@ -13,7 +13,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, LogOut } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Plus, LogOut, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
@@ -31,6 +41,10 @@ const Boards = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [editingBoard, setEditingBoard] = useState<Board | null>(null);
+  const [editBoardName, setEditBoardName] = useState("");
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [deletingBoard, setDeletingBoard] = useState<Board | null>(null);
   
   const { subscription, checkBoardLimit, upgradeToPro } = useSubscription();
 
@@ -95,6 +109,63 @@ const Boards = () => {
     setBoards([data, ...boards]);
   };
 
+  const handleEditBoard = (board: Board) => {
+    setEditingBoard(board);
+    setEditBoardName(board.name);
+    setIsEditDialogOpen(true);
+  };
+
+  const updateBoardName = async () => {
+    if (!editBoardName.trim()) {
+      toast.error("Please enter a board name");
+      return;
+    }
+
+    if (!editingBoard) return;
+
+    setLoading(true);
+
+    const { error } = await supabase
+      .from("boards")
+      .update({ name: editBoardName })
+      .eq("id", editingBoard.id);
+
+    setLoading(false);
+
+    if (error) {
+      toast.error("Failed to update board");
+      return;
+    }
+
+    toast.success("Board updated!");
+    setBoards(boards.map(b => b.id === editingBoard.id ? { ...b, name: editBoardName } : b));
+    setIsEditDialogOpen(false);
+    setEditingBoard(null);
+    setEditBoardName("");
+  };
+
+  const handleDeleteBoard = (board: Board) => {
+    setDeletingBoard(board);
+  };
+
+  const confirmDeleteBoard = async () => {
+    if (!deletingBoard) return;
+
+    const { error } = await supabase
+      .from("boards")
+      .delete()
+      .eq("id", deletingBoard.id);
+
+    if (error) {
+      toast.error("Failed to delete board");
+      return;
+    }
+
+    toast.success("Board deleted");
+    setBoards(boards.filter(b => b.id !== deletingBoard.id));
+    setDeletingBoard(null);
+  };
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     toast.success("Signed out successfully");
@@ -157,17 +228,42 @@ const Boards = () => {
           {boards.map((board) => (
             <Card
               key={board.id}
-              className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => navigate(`/canvas/${board.id}`)}
+              className="cursor-pointer hover:shadow-lg transition-shadow group relative"
             >
-              <CardHeader>
-                <CardTitle className="line-clamp-2">{board.name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Created {new Date(board.created_at).toLocaleDateString()}
-                </p>
-              </CardContent>
+              <div onClick={() => navigate(`/canvas/${board.id}`)}>
+                <CardHeader>
+                  <CardTitle className="line-clamp-2">{board.name}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Created {new Date(board.created_at).toLocaleDateString()}
+                  </p>
+                </CardContent>
+              </div>
+              <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditBoard(board);
+                  }}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8 text-destructive hover:text-destructive"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteBoard(board);
+                  }}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </Card>
           ))}
         </div>
@@ -183,6 +279,55 @@ const Boards = () => {
         type="board"
         limit={subscription?.plan === "pro" ? 999 : 2}
       />
+
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Board</DialogTitle>
+            <DialogDescription>
+              Update the name of your board
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="editBoardName">Board Name</Label>
+              <Input
+                id="editBoardName"
+                value={editBoardName}
+                onChange={(e) => setEditBoardName(e.target.value)}
+                placeholder="My Awesome Board"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") updateBoardName();
+                }}
+              />
+            </div>
+            <Button onClick={updateBoardName} disabled={loading} className="w-full">
+              Update Board
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!deletingBoard} onOpenChange={(open) => !open && setDeletingBoard(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the board "{deletingBoard?.name}" and all its content. 
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteBoard}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
