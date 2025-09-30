@@ -65,7 +65,7 @@ export const GeneratedImageNode = ({ data, id }: GeneratedImageNodeProps) => {
         {data.isGenerating ? (
           <div className="flex flex-col items-center justify-center h-48 gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm text-muted-foreground">Enviando para IA...</p>
+            <p className="text-sm text-muted-foreground">Sending to AI...</p>
           </div>
         ) : data.imageUrl ? (
           <div 
@@ -82,7 +82,7 @@ export const GeneratedImageNode = ({ data, id }: GeneratedImageNodeProps) => {
               <div className="absolute inset-0 bg-background/80 rounded-lg flex flex-col items-center justify-center gap-2 animate-fade-in">
                 <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
                   <Sparkles className="h-3 w-3 text-primary" />
-                  <span>1 crédito necessário</span>
+                  <span>1 credit required</span>
                 </div>
                 <Button
                   onClick={handleDownload}
@@ -97,7 +97,7 @@ export const GeneratedImageNode = ({ data, id }: GeneratedImageNodeProps) => {
           </div>
         ) : (
           <div className="flex items-center justify-center h-48 text-muted-foreground">
-            <p className="text-sm">Aguardando geração...</p>
+            <p className="text-sm">Waiting for generation...</p>
           </div>
         )}
       </div>

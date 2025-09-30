@@ -13,7 +13,7 @@ export const CreditsDisplay = ({ onPurchaseClick }: CreditsDisplayProps) => {
     return (
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Sparkles className="h-4 w-4 animate-pulse" />
-        <span>Carregando...</span>
+        <span>Loading...</span>
       </div>
     );
   }
@@ -29,7 +29,7 @@ export const CreditsDisplay = ({ onPurchaseClick }: CreditsDisplayProps) => {
       className="gap-2"
     >
       <Sparkles className="h-4 w-4 text-primary" />
-      <span className="font-semibold">{balance} créditos</span>
+      <span className="font-semibold">{balance} credits</span>
     </Button>
   );
 };

@@ -33,7 +33,7 @@ export const FreemiumAuthModal = ({ open, onOpenChange, onSuccess, canvasNodes =
           password,
         });
         if (error) throw error;
-        toast.success("Login realizado com sucesso!");
+        toast.success("Login successful!");
       } else {
         const redirectUrl = `${window.location.origin}/`;
         const { error } = await supabase.auth.signUp({
@@ -44,7 +44,7 @@ export const FreemiumAuthModal = ({ open, onOpenChange, onSuccess, canvasNodes =
           },
         });
         if (error) throw error;
-        toast.success("Conta criada com sucesso!");
+        toast.success("Account created successfully!");
       }
       
       onSuccess();

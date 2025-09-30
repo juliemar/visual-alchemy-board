@@ -55,7 +55,7 @@ export const useCredits = () => {
       }
     } catch (error: any) {
       toast({
-        title: "Erro ao processar compra",
+        title: "Error processing purchase",
         description: error.message,
         variant: "destructive",
       });
@@ -81,8 +81,8 @@ export const useCredits = () => {
         const errorMessage = error.message || "";
         if (errorMessage.includes("Insufficient credits") || error.context?.status === 402) {
           toast({
-            title: "Créditos insuficientes",
-            description: "Você precisa comprar mais créditos para baixar esta imagem.",
+            title: "Insufficient credits",
+            description: "You need to purchase more credits to download this image.",
             variant: "destructive",
           });
           return { success: false, needsAuth: false };
@@ -93,8 +93,8 @@ export const useCredits = () => {
       
       if (data?.already_downloaded) {
         toast({
-          title: "Imagem já baixada",
-          description: "Você já baixou esta imagem antes.",
+          title: "Already downloaded",
+          description: "You have already downloaded this image before.",
         });
         // Still return success so download proceeds
         return { success: true, needsAuth: false };
@@ -105,8 +105,8 @@ export const useCredits = () => {
       
       if (data?.new_balance !== undefined) {
         toast({
-          title: "Crédito consumido",
-          description: `Novo saldo: ${data.new_balance} créditos`,
+          title: "Credit consumed",
+          description: `New balance: ${data.new_balance} credits`,
         });
       }
       
@@ -114,8 +114,8 @@ export const useCredits = () => {
     } catch (error: any) {
       console.error("Exception in consumeCredit:", error);
       toast({
-        title: "Erro ao consumir crédito",
-        description: error.message || "Erro desconhecido",
+        title: "Error consuming credit",
+        description: error.message || "Unknown error",
         variant: "destructive",
       });
       return { success: false, needsAuth: false };

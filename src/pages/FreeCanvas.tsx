@@ -195,12 +195,12 @@ const FreeCanvasInner = () => {
         console.error('Failed to generate thumbnail:', thumbError);
       }
 
-      toast.success("Canvas salvo com sucesso!");
+      toast.success("Canvas saved successfully!");
       localStorage.removeItem(STORAGE_KEY);
       navigate(`/canvas/${boardData.id}`);
     } catch (error) {
       console.error("Error migrating canvas:", error);
-      toast.error("Erro ao salvar canvas");
+      toast.error("Error saving canvas");
       navigate("/boards");
     }
   };

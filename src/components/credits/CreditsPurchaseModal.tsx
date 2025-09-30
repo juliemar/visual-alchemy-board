@@ -64,12 +64,12 @@ export const CreditsPurchaseModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Comprar Créditos</DialogTitle>
+          <DialogTitle className="text-2xl">Purchase Credits</DialogTitle>
           <DialogDescription>
-            Cada crédito permite fazer o download de 1 imagem gerada.
+            Each credit allows you to download 1 generated image.
             {credits && (
               <span className="block mt-2 text-foreground font-semibold">
-                Saldo atual: {credits.balance} créditos
+                Current balance: {credits.balance} credits
               </span>
             )}
           </DialogDescription>
@@ -86,7 +86,7 @@ export const CreditsPurchaseModal = ({
             >
               {pkg.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
-                  Mais Popular
+                  Most Popular
                 </div>
               )}
 
@@ -96,17 +96,17 @@ export const CreditsPurchaseModal = ({
                     <Sparkles className="h-5 w-5 text-primary" />
                     <h3 className="text-2xl font-bold">{pkg.credits}</h3>
                     <span className="text-muted-foreground">
-                      {pkg.credits === 1 ? "crédito" : "créditos"}
+                      {pkg.credits === 1 ? "credit" : "credits"}
                     </span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">
-                    ${pkg.pricePerCredit.toFixed(2)} por crédito
+                    ${pkg.pricePerCredit.toFixed(2)} per credit
                   </p>
                 </div>
 
                 {pkg.savings > 0 && (
                   <div className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 px-2 py-1 rounded text-xs font-semibold">
-                    Economize {pkg.savings}%
+                    Save {pkg.savings}%
                   </div>
                 )}
               </div>
@@ -121,7 +121,7 @@ export const CreditsPurchaseModal = ({
                 className="w-full"
                 variant={pkg.popular ? "default" : "outline"}
               >
-                Comprar Agora
+                Buy Now
               </Button>
 
               <div className="mt-4 space-y-2">
@@ -131,11 +131,11 @@ export const CreditsPurchaseModal = ({
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Check className="h-4 w-4 text-green-500" />
-                  <span>Pagamento único via Stripe</span>
+                  <span>One-time payment via Stripe</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Check className="h-4 w-4 text-green-500" />
-                  <span>Sem assinatura</span>
+                  <span>No subscription</span>
                 </div>
               </div>
             </div>
@@ -144,8 +144,8 @@ export const CreditsPurchaseModal = ({
 
         <div className="mt-6 p-4 bg-muted rounded-lg text-sm text-muted-foreground">
           <p>
-            💡 <strong>Dica:</strong> Pacotes maiores oferecem melhor custo-benefício.
-            Você pode gerar quantas imagens quiser - só paga quando baixar!
+            💡 <strong>Tip:</strong> Larger packages offer better value.
+            Generate as many images as you want - you only pay when you download!
           </p>
         </div>
       </DialogContent>
