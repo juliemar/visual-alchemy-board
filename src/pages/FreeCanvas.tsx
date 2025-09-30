@@ -22,7 +22,7 @@ import { CanvasToolbar } from "@/components/canvas/CanvasToolbar";
 import { NodeCreationMenu } from "@/components/canvas/NodeCreationMenu";
 import { FreemiumAuthModal } from "@/components/canvas/FreemiumAuthModal";
 import { Button } from "@/components/ui/button";
-import { LogIn } from "lucide-react";
+import { LogIn, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { generateBoardThumbnail } from "@/lib/boardThumbnail";
 import { toPng } from "html-to-image";
@@ -45,6 +45,7 @@ const FreeCanvasInner = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [generationsCount, setGenerationsCount] = useState(0);
   const [session, setSession] = useState<any>(null);
+  const [isMigrating, setIsMigrating] = useState(false);
 
   // Inicializar canvas com nós padrão
   useEffect(() => {
@@ -128,6 +129,8 @@ const FreeCanvasInner = () => {
       return;
     }
 
+    setIsMigrating(true);
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -197,10 +200,15 @@ const FreeCanvasInner = () => {
 
       toast.success("Canvas saved successfully!");
       localStorage.removeItem(STORAGE_KEY);
-      navigate(`/canvas/${boardData.id}`);
+      
+      // Small delay to show the success message
+      setTimeout(() => {
+        navigate(`/canvas/${boardData.id}`);
+      }, 500);
     } catch (error) {
       console.error("Error migrating canvas:", error);
       toast.error("Error saving canvas");
+      setIsMigrating(false);
       navigate("/boards");
     }
   };
@@ -339,6 +347,16 @@ const FreeCanvasInner = () => {
 
   return (
     <div className="h-screen w-screen">
+      {isMigrating && (
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl font-bold">Saving your work...</h2>
+            <p className="text-muted-foreground">Creating your board and transferring all nodes</p>
+          </div>
+        </div>
+      )}
+
       <div className="absolute top-4 left-4 z-10 flex items-center gap-4">
         <h1 className="text-2xl font-bold">Try for Free</h1>
       </div>
