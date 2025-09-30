@@ -287,9 +287,6 @@ const FreeCanvasInner = () => {
     <div className="h-screen w-screen">
       <div className="absolute top-4 left-4 z-10 flex items-center gap-4">
         <h1 className="text-2xl font-bold">Try for Free</h1>
-        <div className="bg-primary/10 px-3 py-1 rounded-full text-sm">
-          {remainingGenerations} free {remainingGenerations === 1 ? 'image' : 'images'} remaining
-        </div>
       </div>
 
       <div className="absolute top-4 right-4 z-10">
