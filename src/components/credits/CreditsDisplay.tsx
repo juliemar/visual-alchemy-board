@@ -18,6 +18,9 @@ export const CreditsDisplay = ({ onPurchaseClick }: CreditsDisplayProps) => {
     );
   }
 
+  // Always show the credits balance (defaults to 5 for non-authenticated users)
+  const balance = credits?.balance ?? 5;
+
   return (
     <Button
       onClick={onPurchaseClick}
@@ -26,7 +29,7 @@ export const CreditsDisplay = ({ onPurchaseClick }: CreditsDisplayProps) => {
       className="gap-2"
     >
       <Sparkles className="h-4 w-4 text-primary" />
-      <span className="font-semibold">{credits?.balance || 0} créditos</span>
+      <span className="font-semibold">{balance} créditos</span>
     </Button>
   );
 };

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useCredits } from "@/hooks/useCredits";
 import { CreditsPurchaseModal } from "@/components/credits/CreditsPurchaseModal";
+import { FreemiumAuthModal } from "@/components/canvas/FreemiumAuthModal";
 
 interface GeneratedImageNodeProps {
   data: {
@@ -16,25 +17,28 @@ interface GeneratedImageNodeProps {
 export const GeneratedImageNode = ({ data, id }: GeneratedImageNodeProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const { credits, consumeCredit } = useCredits();
 
   const handleDownload = async () => {
     if (!data.imageUrl) return;
-    
-    // Check if user has credits
-    if (!credits || credits.balance < 1) {
-      setShowPurchaseModal(true);
-      return;
-    }
 
-    // Consume credit first
-    const success = await consumeCredit(id);
-    if (!success) {
-      // If consumption failed, show purchase modal
+    // Try to consume credit
+    const result = await consumeCredit(id);
+    
+    if (result.needsAuth) {
+      // User needs to authenticate
+      setShowAuthModal(true);
+      return;
+    }
+    
+    if (!result.success) {
+      // If consumption failed due to insufficient credits, show purchase modal
       setShowPurchaseModal(true);
       return;
     }
     
+    // Download the image
     try {
       const response = await fetch(data.imageUrl);
       const blob = await response.blob();
@@ -96,6 +100,15 @@ export const GeneratedImageNode = ({ data, id }: GeneratedImageNodeProps) => {
           </div>
         )}
       </div>
+
+      <FreemiumAuthModal
+        open={showAuthModal}
+        onOpenChange={setShowAuthModal}
+        onSuccess={() => {
+          setShowAuthModal(false);
+          // After authentication, user can try to download again
+        }}
+      />
 
       <CreditsPurchaseModal
         open={showPurchaseModal}

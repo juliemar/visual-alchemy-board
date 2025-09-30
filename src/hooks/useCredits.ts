@@ -15,6 +15,16 @@ export const useCredits = () => {
 
   const checkCredits = async () => {
     try {
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        // Not authenticated - show 5 free credits (visual only)
+        setCredits({ balance: 5, totalPurchased: 0, totalDownloaded: 0 });
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("check-credits");
       
       if (error) throw error;
@@ -26,7 +36,7 @@ export const useCredits = () => {
       });
     } catch (error) {
       console.error("Error checking credits:", error);
-      setCredits({ balance: 0, totalPurchased: 0, totalDownloaded: 0 });
+      setCredits({ balance: 5, totalPurchased: 0, totalDownloaded: 0 });
     } finally {
       setLoading(false);
     }
@@ -52,8 +62,16 @@ export const useCredits = () => {
     }
   };
 
-  const consumeCredit = async (nodeId: string): Promise<boolean> => {
+  const consumeCredit = async (nodeId: string): Promise<{ success: boolean; needsAuth: boolean }> => {
     try {
+      // Check if user is authenticated
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        // User needs to authenticate to download
+        return { success: false, needsAuth: true };
+      }
+
       const { data, error } = await supabase.functions.invoke("consume-credit", {
         body: { node_id: nodeId }
       });
@@ -65,7 +83,7 @@ export const useCredits = () => {
             description: "Você precisa comprar mais créditos para baixar esta imagem.",
             variant: "destructive",
           });
-          return false;
+          return { success: false, needsAuth: false };
         }
         throw error;
       }
@@ -75,7 +93,7 @@ export const useCredits = () => {
           title: "Imagem já baixada",
           description: "Você já baixou esta imagem antes.",
         });
-        return true;
+        return { success: true, needsAuth: false };
       }
 
       // Refresh credits after consumption
@@ -86,14 +104,14 @@ export const useCredits = () => {
         description: `Novo saldo: ${data.new_balance} créditos`,
       });
       
-      return true;
+      return { success: true, needsAuth: false };
     } catch (error: any) {
       toast({
         title: "Erro ao consumir crédito",
         description: error.message,
         variant: "destructive",
       });
-      return false;
+      return { success: false, needsAuth: false };
     }
   };
 
