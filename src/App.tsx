@@ -9,6 +9,7 @@ import Boards from "./pages/Boards";
 import Canvas from "./pages/Canvas";
 import Backoffice from "./pages/Backoffice";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import PurchaseCredits from "./pages/PurchaseCredits";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/canvas/:boardId" element={<Canvas />} />
           <Route path="/backoffice" element={<Backoffice />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/purchase-credits" element={<PurchaseCredits />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
