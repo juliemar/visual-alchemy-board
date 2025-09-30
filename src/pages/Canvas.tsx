@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
 import { generateBoardThumbnail } from "@/lib/boardThumbnail";
+import { toPng } from "html-to-image";
 
 const nodeTypes = {
   image_upload: ImageUploadNode,
@@ -220,17 +221,20 @@ const CanvasInner = () => {
       if (!boardId || nodes.length === 0) return;
       
       try {
-        const dataUrl = await reactFlowInstance.getViewport();
+        const viewportElement = document.querySelector('.react-flow__viewport') as HTMLElement;
+        if (!viewportElement) {
+          console.error('Viewport element not found');
+          return;
+        }
+
         await generateBoardThumbnail(
           boardId, 
           nodes,
           async () => {
-            // Use viewport screenshot
-            const canvas = document.querySelector('.react-flow__viewport canvas') as HTMLCanvasElement;
-            if (canvas) {
-              return canvas.toDataURL('image/jpeg', 0.8);
-            }
-            return '';
+            return await toPng(viewportElement, {
+              backgroundColor: '#ffffff',
+              quality: 0.8,
+            });
           }
         );
         console.log('Thumbnail generated');
@@ -238,7 +242,7 @@ const CanvasInner = () => {
         console.error('Failed to generate thumbnail:', error);
       }
     }, 3000); // Generate thumbnail 3 seconds after last change
-  }, [boardId, nodes, reactFlowInstance]);
+  }, [boardId, nodes]);
 
   // Trigger autosave and thumbnail when nodes change
   useEffect(() => {

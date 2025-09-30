@@ -233,11 +233,16 @@ const Boards = () => {
             >
               <div onClick={() => navigate(`/canvas/${board.id}`)}>
                 {board.thumbnail_url && (
-                  <div className="w-full h-48 overflow-hidden bg-muted">
+                  <div className="w-full h-48 overflow-hidden bg-muted flex items-center justify-center">
                     <img 
                       src={board.thumbnail_url} 
                       alt={board.name}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Hide image if it fails to load
+                        e.currentTarget.style.display = 'none';
+                      }}
+                      loading="lazy"
                     />
                   </div>
                 )}

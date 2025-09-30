@@ -24,6 +24,8 @@ import { FreemiumAuthModal } from "@/components/canvas/FreemiumAuthModal";
 import { Button } from "@/components/ui/button";
 import { LogIn } from "lucide-react";
 import { toast } from "sonner";
+import { generateBoardThumbnail } from "@/lib/boardThumbnail";
+import { toPng } from "html-to-image";
 
 const nodeTypes = {
   image_upload: ImageUploadNode,
@@ -332,7 +334,87 @@ const FreeCanvasInner = () => {
       <FreemiumAuthModal 
         open={showAuthModal} 
         onOpenChange={setShowAuthModal}
-        onSuccess={() => {}}
+        onSuccess={async () => {
+          try {
+            // Salvar canvas temporário como board real
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            // Criar novo board
+            const { data: boardData, error: boardError } = await supabase
+              .from("boards")
+              .insert({
+                name: "Meu Primeiro Board",
+                user_id: user.id,
+              })
+              .select()
+              .single();
+
+            if (boardError) throw boardError;
+
+            // Salvar todos os nós
+            if (nodes.length > 0) {
+              const nodesData = nodes.map((node) => ({
+                id: node.id,
+                board_id: boardData.id,
+                node_type: node.type,
+                position_x: node.position.x,
+                position_y: node.position.y,
+                node_data: node.data,
+              }));
+
+              const { error: nodesError } = await supabase
+                .from("nodes")
+                .insert(nodesData);
+
+              if (nodesError) throw nodesError;
+            }
+
+            // Salvar todas as conexões
+            if (edges.length > 0) {
+              const connectionsData = edges.map((edge) => ({
+                board_id: boardData.id,
+                source_node_id: edge.source,
+                target_node_id: edge.target,
+              }));
+
+              const { error: connectionsError } = await supabase
+                .from("connections")
+                .insert(connectionsData);
+
+              if (connectionsError) throw connectionsError;
+            }
+
+            // Gerar thumbnail
+            try {
+              const viewportElement = document.querySelector('.react-flow__viewport') as HTMLElement;
+              if (viewportElement) {
+                await generateBoardThumbnail(
+                  boardData.id,
+                  nodes,
+                  async () => {
+                    return await toPng(viewportElement, {
+                      backgroundColor: '#ffffff',
+                      quality: 0.8,
+                    });
+                  }
+                );
+              }
+            } catch (thumbError) {
+              console.error('Failed to generate thumbnail:', thumbError);
+            }
+
+            toast.success("Canvas salvo com sucesso!");
+            
+            // Redirecionar para o board salvo
+            setTimeout(() => {
+              navigate(`/canvas/${boardData.id}`);
+            }, 1000);
+          } catch (error) {
+            console.error("Erro ao salvar canvas:", error);
+            toast.error("Erro ao salvar canvas");
+          }
+        }}
       />
     </div>
   );

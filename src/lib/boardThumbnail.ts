@@ -16,6 +16,11 @@ export const generateBoardThumbnail = async (
     // Generate PNG from React Flow
     const dataUrl = await toPng();
     
+    if (!dataUrl) {
+      console.error('No dataUrl generated');
+      return null;
+    }
+    
     // Convert data URL to blob
     const response = await fetch(dataUrl);
     const blob = await response.blob();
@@ -24,32 +29,41 @@ export const generateBoardThumbnail = async (
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('No user found');
 
-    // Upload to storage
-    const fileName = `${user.id}/${boardId}.jpg`;
+    // Upload to storage with PNG format (better quality for canvas screenshots)
+    const fileName = `${user.id}/${boardId}.png`;
     const { error: uploadError } = await supabase.storage
       .from('board-thumbnails')
       .upload(fileName, blob, {
         upsert: true,
-        contentType: 'image/jpeg',
+        contentType: 'image/png',
       });
 
-    if (uploadError) throw uploadError;
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      throw uploadError;
+    }
 
-    // Get public URL
+    // Get public URL with cache busting
     const { data: { publicUrl } } = supabase.storage
       .from('board-thumbnails')
       .getPublicUrl(fileName);
 
+    // Add timestamp to bust cache
+    const urlWithCache = `${publicUrl}?t=${Date.now()}`;
+
     // Update board with thumbnail URL
     const { error: updateError } = await supabase
       .from('boards')
-      .update({ thumbnail_url: publicUrl })
+      .update({ thumbnail_url: urlWithCache })
       .eq('id', boardId);
 
-    if (updateError) throw updateError;
+    if (updateError) {
+      console.error('Update error:', updateError);
+      throw updateError;
+    }
 
-    console.log('Thumbnail generated successfully');
-    return publicUrl;
+    console.log('Thumbnail generated successfully:', urlWithCache);
+    return urlWithCache;
   } catch (error) {
     console.error('Error generating thumbnail:', error);
     return null;
