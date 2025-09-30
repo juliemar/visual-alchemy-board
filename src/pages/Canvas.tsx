@@ -11,6 +11,7 @@ import {
   Edge,
   Node,
   ReactFlowProvider,
+  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +25,7 @@ import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradeModal } from "@/components/upgrade/UpgradeModal";
+import { generateBoardThumbnail } from "@/lib/boardThumbnail";
 
 const nodeTypes = {
   image_upload: ImageUploadNode,
@@ -34,11 +36,13 @@ const nodeTypes = {
 const CanvasInner = () => {
   const { boardId } = useParams();
   const navigate = useNavigate();
+  const reactFlowInstance = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [boardName, setBoardName] = useState("");
   const [zoom, setZoom] = useState(1);
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
+  const thumbnailTimeoutRef = useRef<NodeJS.Timeout>();
   const isInitialLoadRef = useRef(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradeType, setUpgradeType] = useState<"node" | "board">("node");
@@ -206,18 +210,52 @@ const CanvasInner = () => {
     }, 1000); // Salva 1 segundo após última mudança
   }, [boardId, nodes]);
 
-  // Trigger autosave quando nodes mudam
+  // Generate thumbnail debounced
+  const debouncedThumbnail = useCallback(async () => {
+    if (thumbnailTimeoutRef.current) {
+      clearTimeout(thumbnailTimeoutRef.current);
+    }
+
+    thumbnailTimeoutRef.current = setTimeout(async () => {
+      if (!boardId || nodes.length === 0) return;
+      
+      try {
+        const dataUrl = await reactFlowInstance.getViewport();
+        await generateBoardThumbnail(
+          boardId, 
+          nodes,
+          async () => {
+            // Use viewport screenshot
+            const canvas = document.querySelector('.react-flow__viewport canvas') as HTMLCanvasElement;
+            if (canvas) {
+              return canvas.toDataURL('image/jpeg', 0.8);
+            }
+            return '';
+          }
+        );
+        console.log('Thumbnail generated');
+      } catch (error) {
+        console.error('Failed to generate thumbnail:', error);
+      }
+    }, 3000); // Generate thumbnail 3 seconds after last change
+  }, [boardId, nodes, reactFlowInstance]);
+
+  // Trigger autosave and thumbnail when nodes change
   useEffect(() => {
     if (!isInitialLoadRef.current) {
       debouncedSave();
+      debouncedThumbnail();
     }
-  }, [nodes, debouncedSave]);
+  }, [nodes, debouncedSave, debouncedThumbnail]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
+      }
+      if (thumbnailTimeoutRef.current) {
+        clearTimeout(thumbnailTimeoutRef.current);
       }
     };
   }, []);

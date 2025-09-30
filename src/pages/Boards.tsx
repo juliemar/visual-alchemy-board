@@ -32,6 +32,7 @@ interface Board {
   id: string;
   name: string;
   created_at: string;
+  thumbnail_url?: string | null;
 }
 
 const Boards = () => {
@@ -228,9 +229,18 @@ const Boards = () => {
           {boards.map((board) => (
             <Card
               key={board.id}
-              className="cursor-pointer hover:shadow-lg transition-shadow group relative"
+              className="cursor-pointer hover:shadow-lg transition-shadow group relative overflow-hidden"
             >
               <div onClick={() => navigate(`/canvas/${board.id}`)}>
+                {board.thumbnail_url && (
+                  <div className="w-full h-48 overflow-hidden bg-muted">
+                    <img 
+                      src={board.thumbnail_url} 
+                      alt={board.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
                 <CardHeader>
                   <CardTitle className="line-clamp-2">{board.name}</CardTitle>
                 </CardHeader>
