@@ -169,36 +169,24 @@ const Boards = () => {
 
   const handleSignOut = async () => {
     try {
-      // Try to sign out from Supabase
       const { error } = await supabase.auth.signOut();
       
-      // Even if there's an error (like session_not_found), we should still:
-      // 1. Clear local storage manually
-      // 2. Navigate away
-      // This ensures the user is logged out on the frontend regardless of backend state
-      
-      if (error && error.message !== "Session from session_id claim in JWT does not exist") {
+      if (error) {
         console.error("Sign out error:", error);
-        toast.error("Error signing out, but clearing local session");
+        // Even with error, clear local state
+        toast.error("Error signing out, clearing session");
       } else {
         toast.success("Signed out successfully");
       }
       
-      // Force clear any remaining auth data
-      localStorage.removeItem('supabase.auth.token');
-      
-      // Navigate to home and trigger full auth state refresh
+      // Navigate to home - the Index page will handle showing the logged-out state
+      // No need to reload, the onAuthStateChange listener will update automatically
       navigate("/", { replace: true });
       
-      // Force reload to clear any cached state
-      window.location.reload();
     } catch (err) {
       console.error("Unexpected error during sign out:", err);
       toast.error("Error signing out");
-      // Still try to navigate away and clear state
-      localStorage.removeItem('supabase.auth.token');
       navigate("/", { replace: true });
-      window.location.reload();
     }
   };
 
