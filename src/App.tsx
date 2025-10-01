@@ -6,6 +6,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
 import GeradorImagemIA from "./pages/GeradorImagemIA";
+import ComoCrearImagemIA from "./pages/ComoCrearImagemIA";
+import IAQueCriaImagens from "./pages/IAQueCriaImagens";
+import TransformarTextoEmImagem from "./pages/TransformarTextoEmImagem";
+import CriarArteComIA from "./pages/CriarArteComIA";
 import Boards from "./pages/Boards";
 import Canvas from "./pages/Canvas";
 import Backoffice from "./pages/Backoffice";
@@ -25,6 +29,10 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/landing" element={<Landing />} />
           <Route path="/gerador-imagem-ia-gratis" element={<GeradorImagemIA />} />
+          <Route path="/como-criar-imagem-com-ia" element={<ComoCrearImagemIA />} />
+          <Route path="/ia-que-cria-imagens" element={<IAQueCriaImagens />} />
+          <Route path="/transformar-texto-em-imagem" element={<TransformarTextoEmImagem />} />
+          <Route path="/criar-arte-com-ia-gratis" element={<CriarArteComIA />} />
           <Route path="/boards" element={<Boards />} />
           <Route path="/canvas/:boardId" element={<Canvas />} />
           <Route path="/backoffice" element={<Backoffice />} />

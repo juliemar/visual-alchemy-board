@@ -10,9 +10,37 @@
     <priority>1.0</priority>
   </url>
   
-  <!-- SEO Landing Page -->
+  <!-- SEO Landing Pages -->
   <url>
     <loc>https://canvasbanana.lovable.app/gerador-imagem-ia-gratis</loc>
+    <lastmod>2025-10-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://canvasbanana.lovable.app/como-criar-imagem-com-ia</loc>
+    <lastmod>2025-10-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://canvasbanana.lovable.app/ia-que-cria-imagens</loc>
+    <lastmod>2025-10-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://canvasbanana.lovable.app/transformar-texto-em-imagem</loc>
+    <lastmod>2025-10-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <url>
+    <loc>https://canvasbanana.lovable.app/criar-arte-com-ia-gratis</loc>
     <lastmod>2025-10-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
