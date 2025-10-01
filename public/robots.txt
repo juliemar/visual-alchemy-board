@@ -1,8 +1,25 @@
+# Canvas Banana - Robots.txt
+# Gerador de Imagens com Inteligência Artificial
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+Disallow: /backoffice
+Disallow: /canvas/
+Disallow: /boards
+
+# Specific rules for major search engines
 User-agent: Googlebot
 Allow: /
+Disallow: /backoffice
+Disallow: /canvas/
+Disallow: /boards
 
 User-agent: Bingbot
 Allow: /
+Disallow: /backoffice
+Disallow: /canvas/
+Disallow: /boards
 
 User-agent: Twitterbot
 Allow: /
@@ -10,5 +27,5 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
-User-agent: *
-Allow: /
+# Sitemap location
+Sitemap: https://canvasbanana.lovable.app/sitemap.xml

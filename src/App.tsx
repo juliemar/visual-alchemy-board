@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
+import GeradorImagemIA from "./pages/GeradorImagemIA";
 import Boards from "./pages/Boards";
 import Canvas from "./pages/Canvas";
 import Backoffice from "./pages/Backoffice";
@@ -23,6 +24,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/landing" element={<Landing />} />
+          <Route path="/gerador-imagem-ia-gratis" element={<GeradorImagemIA />} />
           <Route path="/boards" element={<Boards />} />
           <Route path="/canvas/:boardId" element={<Canvas />} />
           <Route path="/backoffice" element={<Backoffice />} />
